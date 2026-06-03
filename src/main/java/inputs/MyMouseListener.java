@@ -7,6 +7,9 @@ package inputs;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import main.EstadoJuego;
+import static main.EstadoJuego.*;
+import main.Juego;
 
 /**
  *
@@ -14,20 +17,50 @@ import java.awt.event.MouseMotionListener;
  */
 public class MyMouseListener implements MouseListener,MouseMotionListener{
 
+    private Juego juego;
+    
+    public MyMouseListener(Juego juego){
+        this.juego = juego;
+    }
     @Override
     public void mouseClicked(MouseEvent me) {
         if(me.getButton() == MouseEvent.BUTTON1){
-            System.out.println("M1 click");
+            switch(EstadoJuego.estadoJuego){
+                case MENU:
+                    juego.getMenu().mouseClicked(me.getX(),me.getY());
+                    break;
+                case JUGANDO:
+                    break;
+                case AJUSTES:
+                    break;
+            }
         }
-        
-        if(me.getButton() == MouseEvent.BUTTON2){
-            System.out.println("M2 click");
-        }
+    }
+    
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        switch(EstadoJuego.estadoJuego){
+                case MENU:
+                    juego.getMenu().mouseMoved(me.getX(),me.getY());
+                    break;
+                case JUGANDO:
+                    break;
+                case AJUSTES:
+                    break;
+            }
     }
 
     @Override
     public void mousePressed(MouseEvent me) {
-        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        switch(EstadoJuego.estadoJuego){
+                case MENU:
+                    juego.getMenu().mousePressed(me.getX(),me.getY());
+                    break;
+                case JUGANDO:
+                    break;
+                case AJUSTES:
+                    break;
+            }
     }
 
     @Override
@@ -50,9 +83,6 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
         //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
-    public void mouseMoved(MouseEvent me) {
-        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    
     
 }

@@ -12,4 +12,7 @@ import java.awt.Graphics;
  */
 public interface MetodosEscena {
     public void render(Graphics g);
+    public void mouseClicked(int x, int y);
+    public void mouseMoved(int x, int y);
+    public void mousePressed(int x, int y);
 }

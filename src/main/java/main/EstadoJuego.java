@@ -13,4 +13,7 @@ public enum EstadoJuego {
     
     
     public static EstadoJuego estadoJuego = MENU;
+    public static void SetEstadoJuego(EstadoJuego estado){
+        estadoJuego = estado;
+    }
 }

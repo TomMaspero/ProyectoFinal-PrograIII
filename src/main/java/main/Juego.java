@@ -18,8 +18,7 @@ public class Juego extends JFrame implements Runnable{
     private final double FPS_SET = 60.0;
     private final double UPS_SET = 60.0;
     
-    private MyMouseListener myMouseListener;
-    private KeyboardListener myKeyboardListener;
+    
     
     private Thread hiloJuego;
     
@@ -43,22 +42,13 @@ public class Juego extends JFrame implements Runnable{
         setVisible(true);
     }
     
-    private void initInputs(){
-        myMouseListener = new MyMouseListener();
-        myKeyboardListener = new KeyboardListener();
-        
-        addMouseListener(myMouseListener);
-        addMouseMotionListener(myMouseListener);
-        addKeyListener(myKeyboardListener);
-        
-        requestFocus();
-    }
     
     
 
     public static void main(String[] args) {
         Juego juego = new Juego();
-        juego.initInputs();
+        juego.pantallaJuego.initInputs(); // Es un metodo de Pantalla porque se toman solamente 
+                                            // las coordenadas del JPanel
         juego.start();
     }
 

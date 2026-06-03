@@ -4,6 +4,8 @@
  */
 package main;
 
+import inputs.KeyboardListener;
+import inputs.MyMouseListener;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,12 +19,12 @@ import javax.swing.JPanel;
  * @author Lucio
  */
 public class Pantalla extends JPanel {
-
-    //private Random random
-
     
     private Dimension size;
     private Juego juego;
+    
+    private MyMouseListener myMouseListener;
+    private KeyboardListener myKeyboardListener;
     
     
     
@@ -38,6 +40,18 @@ public class Pantalla extends JPanel {
         setPreferredSize(size);
         setMaximumSize(size);
     }
+    
+    public void initInputs(){
+        myMouseListener = new MyMouseListener(juego);
+        myKeyboardListener = new KeyboardListener();
+        
+        addMouseListener(myMouseListener);
+        addMouseMotionListener(myMouseListener);
+        addKeyListener(myKeyboardListener);
+        
+        requestFocus();
+    }
+    
     
     @Override
     public void paintComponent(Graphics g){
