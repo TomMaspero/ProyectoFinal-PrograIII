@@ -24,7 +24,13 @@ public class Juego extends JFrame implements Runnable{
 
     // DAOs
     private final JugadorDAO jugadorDAO;
+    private final PartidaDAO partidaDAO;
+    private final PuntajeDAO puntajeDAO;
+    private final ConfiguracionDAO configuracionDAO;
+    private final PlantaDAO plantaDAO;
+
     private Thread hiloJuego;
+
     //Clases
     private Render render;
     private Menu menu;
@@ -40,6 +46,11 @@ public class Juego extends JFrame implements Runnable{
         dbManager = new DBManager(dbConnect);
 
         jugadorDAO       = new JugadorDAO(dbManager);
+        partidaDAO       = new PartidaDAO(dbManager);
+        puntajeDAO       = new PuntajeDAO(dbManager);
+        configuracionDAO = new ConfiguracionDAO(dbManager);
+        plantaDAO = new PlantaDAO(dbManager);
+
         initClases();
         
          
@@ -126,7 +137,10 @@ public class Juego extends JFrame implements Runnable{
     public Ajustes getAjustes() {
         return ajustes;
     }
-    
 
     public JugadorDAO getJugadorDAO()             { return jugadorDAO; }
+    public PartidaDAO getPartidaDAO()             { return partidaDAO; }
+    public PuntajeDAO getPuntajeDAO()             { return puntajeDAO; }
+    public ConfiguracionDAO getConfiguracionDAO() { return configuracionDAO; }
+    public PlantaDAO getPlantaDAO() { return plantaDAO; }
 }
