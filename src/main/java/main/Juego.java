@@ -21,6 +21,9 @@ public class Juego extends JFrame implements Runnable{
     private final double UPS_SET = 60.0;
     private final DBConnect dbConnect;
     private final DBManager dbManager;
+
+    // DAOs
+    private final JugadorDAO jugadorDAO;
     private Thread hiloJuego;
     //Clases
     private Render render;
@@ -35,6 +38,8 @@ public class Juego extends JFrame implements Runnable{
         
         dbConnect = new DBConnect("jdbc:mysql://localhost:3306/PlantsVsZombies", "root", "");
         dbManager = new DBManager(dbConnect);
+
+        jugadorDAO       = new JugadorDAO(dbManager);
         initClases();
         
          
@@ -122,4 +127,6 @@ public class Juego extends JFrame implements Runnable{
         return ajustes;
     }
     
+
+    public JugadorDAO getJugadorDAO()             { return jugadorDAO; }
 }
