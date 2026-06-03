@@ -1,44 +1,64 @@
 package main;
 
+import escenas.Ajustes;
+import escenas.Jugando;
+import escenas.Menu;
+import inputs.KeyboardListener;
+import inputs.MyMouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+
+
 public class Juego extends JFrame implements Runnable{
     private Pantalla pantallaJuego;
     private final double FPS_SET = 60.0;
     private final double UPS_SET = 60.0;
-    private BufferedImage img;
+    
+    private MyMouseListener myMouseListener;
+    private KeyboardListener myKeyboardListener;
     
     private Thread hiloJuego;
     
+    //Clases
+    private Render render;
+    private Menu menu;
+    private Jugando jugando;
+    private Ajustes ajustes;
+    
     public Juego(){ 
-        importImg();
-        
-        setSize(640,480);
-        
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        pantallaJuego = new Pantalla(img);
+        setResizable(false);
+        
+        initClases();
+        
+         
         add(pantallaJuego);
+        pack();
+        
         setVisible(true);
     }
     
-    private void importImg() {
-        InputStream is = getClass().getResourceAsStream("/pea.png");
+    private void initInputs(){
+        myMouseListener = new MyMouseListener();
+        myKeyboardListener = new KeyboardListener();
         
-        try{
-            img = ImageIO.read(is);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
+        addMouseListener(myMouseListener);
+        addMouseMotionListener(myMouseListener);
+        addKeyListener(myKeyboardListener);
+        
+        requestFocus();
     }
+    
+    
 
     public static void main(String[] args) {
         Juego juego = new Juego();
-        
+        juego.initInputs();
         juego.start();
     }
 
@@ -83,6 +103,31 @@ public class Juego extends JFrame implements Runnable{
         hiloJuego = new Thread(this){};
         hiloJuego.start();
     }
+    
+    // Getters y setters
+    
+    public Render getRender(){
+        return render;
+    }
 
+    private void initClases() {
+        render = new Render(this);
+        pantallaJuego = new Pantalla(this);
+        menu = new Menu(this);
+        ajustes = new Ajustes(this);
+        jugando = new Jugando(this);
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public Jugando getJugando() {
+        return jugando;
+    }
+
+    public Ajustes getAjustes() {
+        return ajustes;
+    }
     
 }
