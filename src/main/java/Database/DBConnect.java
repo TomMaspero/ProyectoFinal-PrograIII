@@ -34,6 +34,10 @@ public final class DBConnect {
         System.out.println("Database connected");
     }
     
+    public Connection getConnection() {
+        return connection;
+    }
+
     public ResultSet runQuery(String query){
         ResultSet resultSet = null;
         
