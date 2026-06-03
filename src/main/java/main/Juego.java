@@ -1,5 +1,6 @@
 package main;
 
+import Database.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,11 +8,15 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 public class Juego extends JFrame{
-    private Pantalla pantallaJuego;
-    
+    private final Pantalla pantallaJuego;
+    private final DBConnect dbConnect;
+    private final DBManager dbManager;
     private BufferedImage img;
     
     public Juego(){
+        dbConnect = new DBConnect("jdbc:mysql://localhost:3306/PlantsVsZombies", "root", "");
+        dbManager = new DBManager(dbConnect);
+        
         importImg();
         
         setSize(640,640);
