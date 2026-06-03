@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import Database.*;
+import dao.*;
 
 
 
@@ -17,11 +19,9 @@ public class Juego extends JFrame implements Runnable{
     private Pantalla pantallaJuego;
     private final double FPS_SET = 60.0;
     private final double UPS_SET = 60.0;
-    
-    
-    
+    private final DBConnect dbConnect;
+    private final DBManager dbManager;
     private Thread hiloJuego;
-    
     //Clases
     private Render render;
     private Menu menu;
@@ -33,6 +33,8 @@ public class Juego extends JFrame implements Runnable{
         setLocationRelativeTo(null);
         setResizable(false);
         
+        dbConnect = new DBConnect("jdbc:mysql://localhost:3306/PlantsVsZombies", "root", "");
+        dbManager = new DBManager(dbConnect);
         initClases();
         
          
