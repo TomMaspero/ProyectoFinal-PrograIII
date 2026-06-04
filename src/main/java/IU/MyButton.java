@@ -77,6 +77,11 @@ public class MyButton {
     public Rectangle getBounds(){
         return bounds;
     }
+    
+    public void resetBooleans(){
+        this.mouseOver = false;
+        this.mousePressed = false;
+    }
 
     
     

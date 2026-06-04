@@ -4,6 +4,7 @@
  */
 package escenas;
 
+import IU.Hotbar;
 import helpers.EditorNivel;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -17,6 +18,7 @@ import managers.TileManager;
 public class Jugando extends EscenaJuego implements MetodosEscena{
     private int[][] lvl;
     private TileManager tileManager;
+    private Hotbar hotbar;
     
     
     public Jugando(Juego juego) {
@@ -24,6 +26,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
         
         lvl = EditorNivel.getLevelData();
         tileManager = new TileManager();
+        hotbar = new Hotbar(0,480,480,100);
         // Nivel
         // Tile Manager
     }
@@ -38,21 +41,36 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
                g.drawImage(tileManager.getSprite(id), 78+x*29, 19+y*31, null);
            }
        }
+       
+       hotbar.draw(g);
     }
+    
+    
 
     @Override
     public void mouseClicked(int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(y>=480){
+            hotbar.mouseClicked(x, y);
+        }
     }
 
     @Override
     public void mouseMoved(int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        if(y>=480){
+            hotbar.mouseMoved(x, y);
+        }
     }
 
     @Override
     public void mousePressed(int x, int y) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         if(y>=480){
+            hotbar.mousePressed(x, y);
+        }
+    }
+
+    @Override
+    public void mouseReleased(int x, int y) {
+            hotbar.mouseReleased(x, y);
     }
     
 }
