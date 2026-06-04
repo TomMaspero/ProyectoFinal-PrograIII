@@ -5,7 +5,6 @@
 package escenas;
 
 import IU.MyButton;
-import java.awt.Color;
 import java.awt.Graphics;
 import static main.EstadoJuego.*;
 import main.Juego;
@@ -41,6 +40,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
         }
     }
 
+    @Override
     public void mouseMoved(int x, int y) {
          bJugar.setMouseOver(false);
         if(bJugar.getBounds().contains(x,y)){
@@ -48,10 +48,20 @@ public class Menu extends EscenaJuego implements MetodosEscena{
         }
     }
 
+    @Override
     public void mousePressed(int x, int y) {
         if(bJugar.getBounds().contains(x,y)){
             bJugar.setMousePressed(true);
         }
+    }
+
+    @Override
+    public void mouseReleased(int x, int y) {
+        resetButtons();
+    }
+
+    private void resetButtons() {
+        bJugar.resetBooleans();    
     }
     
 }

@@ -66,7 +66,7 @@ public class Juego extends JFrame implements Runnable{
     public static void main(String[] args) {
         Juego juego = new Juego();
         juego.pantallaJuego.initInputs(); // Es un metodo de Pantalla porque se toman solamente 
-                                            // las coordenadas del JPanel
+                                         // las coordenadas del JPanel
         juego.start();
     }
 

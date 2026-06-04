@@ -65,7 +65,15 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        //throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        switch(EstadoJuego.estadoJuego){
+                case MENU:
+                    juego.getMenu().mouseReleased(me.getX(),me.getY());
+                    break;
+                case JUGANDO:
+                    break;
+                case AJUSTES:
+                    break;
+            }
     }
 
     @Override
