@@ -30,8 +30,10 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
                     juego.getMenu().mouseClicked(me.getX(),me.getY());
                     break;
                 case JUGANDO:
+                    juego.getJugando().mouseClicked(me.getX(),me.getY());
                     break;
                 case AJUSTES:
+                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
                     break;
             }
         }
@@ -44,8 +46,10 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
                     juego.getMenu().mouseMoved(me.getX(),me.getY());
                     break;
                 case JUGANDO:
+                    juego.getJugando().mouseMoved(me.getX(),me.getY());
                     break;
                 case AJUSTES:
+                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
                     break;
             }
     }
@@ -57,8 +61,10 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
                     juego.getMenu().mousePressed(me.getX(),me.getY());
                     break;
                 case JUGANDO:
+                    juego.getJugando().mousePressed(me.getX(),me.getY());
                     break;
                 case AJUSTES:
+                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
                     break;
             }
     }
@@ -70,8 +76,10 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
                     juego.getMenu().mouseReleased(me.getX(),me.getY());
                     break;
                 case JUGANDO:
+                    juego.getJugando().mouseReleased(me.getX(), me.getY());
                     break;
                 case AJUSTES:
+                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
                     break;
             }
     }

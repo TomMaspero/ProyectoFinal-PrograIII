@@ -53,8 +53,8 @@ public class MyButton {
     
     private void drawText(Graphics g){
         int w = g.getFontMetrics().stringWidth(text);
-        
-        g.drawString(text, x - w + width / 2 , y + height / 2);
+        g.setColor(Color.BLACK);
+        g.drawString(text, x + width / 2 - w / 2, y + height / 2);
     }
     
     private void drawBorder(Graphics g) {
