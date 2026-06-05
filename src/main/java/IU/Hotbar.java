@@ -35,7 +35,7 @@ public class Hotbar {
     }
     
     private void initButtons() {
-        bMenu = new MyButton("Menu",2,482,100,30);
+        bMenu = new MyButton("Menu",2,362,100,30);
     }
     
     private void drawButtons(Graphics g) {

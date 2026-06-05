@@ -27,7 +27,7 @@ public class TileManager {
     private void loadAtlas() {
         peaAtlas = CargaGuarda.getSpriteAtlas("pea.png");
         sunAtlas = CargaGuarda.getSpriteAtlas("sunflower.png");
-        gardenAtlas = CargaGuarda.getSpriteAtlas("garden.png");
+        gardenAtlas = CargaGuarda.getSpriteAtlas("garden_escalado.png");
         grassAtlas = CargaGuarda.getSpriteAtlas("pasto_t.png");
         //peaAtlas = CargaGuarda.getPeaSpriteAtlas();
         //sunAtlas = CargaGuarda.getSunSpriteAtlas();
@@ -38,7 +38,7 @@ public class TileManager {
     private void createTiles() {
         tiles.add(PLANTA = new Tile(getSprite(169,13,peaAtlas))); // ID 0
         tiles.add(GIRASOL = new Tile(getSprite(237,120,sunAtlas))); // ID 1
-        tiles.add(JARDIN = new Tile(getLargeSprite(2,2,gardenAtlas))); // ID 2
+        tiles.add(JARDIN = new Tile(getLargeSprite(0,0,gardenAtlas))); // ID 2
         tiles.add(PASTO = new Tile(getMediumSprite(0,0,grassAtlas))); // ID 3
     }
     
@@ -55,7 +55,7 @@ public class TileManager {
     }
 
     private BufferedImage getLargeSprite(int xC, int yC, BufferedImage atlas) {
-        return atlas.getSubimage(xC, yC, 447, 192);
+        return atlas.getSubimage(xC, yC, 640, 360);
     }
     
     

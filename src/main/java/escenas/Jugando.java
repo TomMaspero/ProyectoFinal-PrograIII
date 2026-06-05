@@ -26,7 +26,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
         
         lvl = EditorNivel.getLevelData();
         tileManager = new TileManager();
-        hotbar = new Hotbar(0,480,480,100);
+        hotbar = new Hotbar(0,360,640,100);
         // Nivel
         // Tile Manager
     }
@@ -49,21 +49,21 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
 
     @Override
     public void mouseClicked(int x, int y) {
-        if(y>=480){
+        if(y>=360){
             hotbar.mouseClicked(x, y);
         }
     }
 
     @Override
     public void mouseMoved(int x, int y) {
-        if(y>=480){
+        if(y>=360){
             hotbar.mouseMoved(x, y);
         }
     }
 
     @Override
     public void mousePressed(int x, int y) {
-         if(y>=480){
+         if(y>=360){
             hotbar.mousePressed(x, y);
         }
     }
