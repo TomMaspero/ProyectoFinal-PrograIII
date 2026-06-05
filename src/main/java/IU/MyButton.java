@@ -28,6 +28,8 @@ public class MyButton {
         initBounds();
     }
     
+    // Hay que agregar otro constructor para botones de la hotbar, agregando id
+    
 
     private void initBounds() {
         this.bounds = new Rectangle(x,y,width,height);
@@ -70,8 +72,16 @@ public class MyButton {
         this.mouseOver = mouseOver;
     }
     
+    public boolean isMouseOver(){
+        return mouseOver;
+    }
+    
     public void setMousePressed(boolean mousePressed){
         this.mousePressed = mousePressed;
+    }
+    
+    public boolean isMousePressed(){
+        return mousePressed;
     }
     
     public Rectangle getBounds(){

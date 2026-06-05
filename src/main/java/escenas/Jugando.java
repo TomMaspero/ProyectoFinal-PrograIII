@@ -26,7 +26,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
         
         lvl = EditorNivel.getLevelData();
         tileManager = new TileManager();
-        hotbar = new Hotbar(0,360,640,100);
+        hotbar = new Hotbar(0,360,640,100,this);
         // Nivel
         // Tile Manager
     }
@@ -45,6 +45,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
        hotbar.draw(g);
     }
     
+    public TileManager getTileManager(){
+        return tileManager;
+    }
     
 
     @Override

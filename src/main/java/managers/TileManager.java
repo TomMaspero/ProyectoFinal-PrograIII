@@ -36,10 +36,11 @@ public class TileManager {
     }
 
     private void createTiles() {
-        tiles.add(PLANTA = new Tile(getSprite(169,13,peaAtlas))); // ID 0
-        tiles.add(GIRASOL = new Tile(getSprite(237,120,sunAtlas))); // ID 1
-        tiles.add(JARDIN = new Tile(getLargeSprite(0,0,gardenAtlas))); // ID 2
-        tiles.add(PASTO = new Tile(getMediumSprite(0,0,grassAtlas))); // ID 3
+        int id = 0;
+        tiles.add(PLANTA = new Tile(getSprite(169,13,peaAtlas),id++,"Planta")); // ID 0
+        tiles.add(GIRASOL = new Tile(getSprite(237,120,sunAtlas),id++,"Girasol")); // ID 1
+        tiles.add(JARDIN = new Tile(getLargeSprite(0,0,gardenAtlas),id++,"Jardin")); // ID 2
+        tiles.add(PASTO = new Tile(getMediumSprite(0,0,grassAtlas),id++,"Pasto")); // ID 3
     }
     
     public BufferedImage getSprite(int id){
