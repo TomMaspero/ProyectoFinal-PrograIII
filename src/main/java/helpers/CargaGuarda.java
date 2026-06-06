@@ -10,47 +10,15 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 /**
- *
+ * Maneja carga y guardado de recursos del juego.
  * @author lucio
  */
 public class CargaGuarda {
-    
-    public static BufferedImage getPeaSpriteAtlas(){
-    BufferedImage img = null;
-    InputStream is = CargaGuarda.class.getClassLoader().getResourceAsStream("pea.png");
-        
-        try{
-            img = ImageIO.read(is);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-        return img;
-    }
-    
-    public static BufferedImage getSunSpriteAtlas(){
-    BufferedImage img = null;
-    InputStream is = CargaGuarda.class.getClassLoader().getResourceAsStream("sunflower.png");
-        
-        try{
-            img = ImageIO.read(is);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-        return img;
-    }
-
-    public static BufferedImage getGardenSpriteAtlas() {
-         BufferedImage img = null;
-    InputStream is = CargaGuarda.class.getClassLoader().getResourceAsStream("garden.png");
-        
-        try{
-            img = ImageIO.read(is);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-        return img;
-    }
-    
+    /**
+     * Carga un atlas de sprites desde una imagen.
+     * @param atlasName Nombre de la imagen
+     * @return Imagen leida
+     */
     public static BufferedImage getSpriteAtlas(String atlasName){
     BufferedImage img = null;
     InputStream is = CargaGuarda.class.getClassLoader().getResourceAsStream(atlasName);

@@ -5,27 +5,22 @@
 package main;
 
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import javax.imageio.ImageIO;
 
 /**
- *
+ * Se encarga del renderizado principal del juego.
+ * @param juego Se pasa el juego como parametro. Luego se utiliza para indicar sus escenas.
  * @author lucio
  */
 public class Render {
     private Juego juego;
-        private BufferedImage img;
-    private ArrayList<BufferedImage> sprites = new ArrayList<>();
     
     public Render(Juego juego){
         this.juego = juego;
-        importImg();
-        loadSprites();
     }
-    
+    /**
+     * Se utiliza para renderizar las escenas del juego segun lo definido en la clase {@link main.EstadoJuego}
+     * 
+     */
     public void render(Graphics g){
         switch(EstadoJuego.estadoJuego){
             case MENU:
@@ -39,25 +34,4 @@ public class Render {
                 break;
         }
     }
-    
-    private void loadSprites() {
-        
-            for(int x=0;x<8;x++){
-                sprites.add(img.getSubimage(169+x*29,13, 28, 32)); // Hay que rehacer la imagen de sprites
-                                                                    // para que esten alineados, asi se pueden recorrer
-            }
-        
-    }
-    
-    private void importImg() {
-        InputStream is = getClass().getResourceAsStream("/pea.png");
-        
-        try{
-            img = ImageIO.read(is);
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-    
-    
 }

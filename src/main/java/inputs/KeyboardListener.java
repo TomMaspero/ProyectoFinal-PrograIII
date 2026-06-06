@@ -13,7 +13,7 @@ import static main.EstadoJuego.*;
 
 
 /**
- *
+ * Se encarga de traducir los comandos de teclado a las acciones del juego.
  * @author lucio
  */
 public class KeyboardListener implements KeyListener{

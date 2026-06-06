@@ -7,7 +7,8 @@ package escenas;
 import java.awt.Graphics;
 
 /**
- *
+ * Contiene los metodos utilizados por las distintas escenas del juego definidas en {@link main.EstadoJuego}
+ * y sus clases en el paquete escenas
  * @author lucio
  */
 public interface MetodosEscena {

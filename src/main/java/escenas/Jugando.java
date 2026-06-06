@@ -6,7 +6,6 @@ package escenas;
 
 import IU.Hotbar;
 import helpers.EditorNivel;
-import java.awt.Color;
 import java.awt.Graphics;
 import main.Juego;
 import managers.TileManager;
@@ -16,7 +15,7 @@ import managers.TileManager;
  * @author lucio
  */
 public class Jugando extends EscenaJuego implements MetodosEscena{
-    private int[][] lvl;
+    private int[][] lvl; // Array de numeros que representan los tiles del nivel cargado
     private TileManager tileManager;
     private Hotbar hotbar;
     

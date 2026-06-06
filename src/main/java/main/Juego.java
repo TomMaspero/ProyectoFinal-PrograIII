@@ -14,7 +14,11 @@ import Database.*;
 import dao.*;
 
 
-
+/**
+ * Clase principal del juego, la cual contiene variables de renderización, conexión con la base de datos,
+ * el bucle principal, actualizaciones y su hilo.
+ * @author Lucio
+ */
 public class Juego extends JFrame implements Runnable{
     private Pantalla pantallaJuego;
     private final double FPS_SET = 60.0;
@@ -67,10 +71,12 @@ public class Juego extends JFrame implements Runnable{
         Juego juego = new Juego();
         juego.pantallaJuego.initInputs(); // Es un metodo de Pantalla porque se toman solamente 
                                          // las coordenadas del JPanel
-        juego.start();
+        juego.start(); // Inicialización del juego dentro de un hilo.
     }
 
-
+    /**
+     * Contiene las variables referidas a los FPS, UPS y el bucle de juego.
+     */
     @Override
     public void run() {
         double timePerFrame = 1000000000.0/ FPS_SET;

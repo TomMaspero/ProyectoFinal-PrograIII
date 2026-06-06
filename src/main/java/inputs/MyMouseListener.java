@@ -12,7 +12,7 @@ import static main.EstadoJuego.*;
 import main.Juego;
 
 /**
- *
+ * Se encarga de traducir los comandos del raton en acciones del juego
  * @author lucio
  */
 public class MyMouseListener implements MouseListener,MouseMotionListener{
@@ -23,6 +23,9 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
         this.juego = juego;
     }
     @Override
+    /**
+     * Leyendo las coordenadas del raton, comprueba si se hizo click en un objeto y cambia la escena de ser necesario.
+     */
     public void mouseClicked(MouseEvent me) {
         if(me.getButton() == MouseEvent.BUTTON1){
             switch(EstadoJuego.estadoJuego){

@@ -9,7 +9,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 
 /**
- *
+ * Clase base para definir los botones en la IU del juego
  * @author lucio
  */
 public class MyButton {
@@ -17,7 +17,14 @@ public class MyButton {
     private String text;
     private Rectangle bounds;
     private boolean mouseOver, mousePressed;
-    
+    /**
+     * Constructor base para los botones de la IU del juego
+     * @param text Nombre del boton
+     * @param x Posición x de renderizado en pantalla(px)
+     * @param y Posición y de renderizado en pantalla(px)
+     * @param width Ancho del boton(px)
+     * @param height Alto del boton(px)
+     */
     public MyButton(String text,int x, int y, int width, int height) {
         this.x = x;
         this.y = y;

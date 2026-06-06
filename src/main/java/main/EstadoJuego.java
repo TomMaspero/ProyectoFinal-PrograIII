@@ -5,7 +5,7 @@
 package main;
 
 /**
- *
+ * Se definen los estados del juego y sus métodos relacionados.
  * @author lucio
  */
 public enum EstadoJuego {

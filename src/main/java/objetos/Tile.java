@@ -7,7 +7,7 @@ package objetos;
 import java.awt.image.BufferedImage;
 
 /**
- *
+ * Clase base para los tiles del juego.
  * @author lucio
  */
 public class Tile {

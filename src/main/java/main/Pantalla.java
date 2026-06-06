@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 /**
- *
+ * Contiene componentes tanto de manejo de la pantalla del juego como del procesamiento de inputs,
+ * mediante las clases especificas {@link inputs.KeyboardListener} y {@link inputs.MyMouseListener}
  * @author Lucio
  */
 public class Pantalla extends JPanel {

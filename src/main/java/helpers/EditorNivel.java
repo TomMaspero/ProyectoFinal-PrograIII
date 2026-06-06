@@ -5,7 +5,7 @@
 package helpers;
 
 /**
- *
+ * Constructor básico del nivel mediante un array estático.
  * @author lucio
  */
 public class EditorNivel {
