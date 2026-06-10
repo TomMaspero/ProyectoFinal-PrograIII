@@ -50,6 +50,15 @@ public class TileManager {
     public BufferedImage getSprite(int id){
         return tiles.get(id).getSprite();
     }
+
+    /**
+     * Retorna el sprite de una planta según su plantaId de la base de datos.
+     * plantaId 1 (Peashooter) → tile 0, plantaId 2 (Sunflower) → tile 1, etc.
+     * @param plantaId ID de la planta en la tabla 'plantas'
+     */
+    public BufferedImage getSpriteByPlantaId(int plantaId) {
+        return getSprite(plantaId - 1);
+    }
     /**
      * Retorna un tile pequeño segun coordenadas y su atlas.
      */
