@@ -71,9 +71,9 @@ public class MyButton {
         g.fillRect(x,y,width,height);
 
         if (sprite != null) {
-            // Centra el sprite en la mitad superior del botón
+            // Centra el sprite en la mitad superior del botón; clamp para no salir del borde
             int sx = x + (width  - sprite.getWidth())  / 2;
-            int sy = y + (height / 2 - sprite.getHeight()) / 2;
+            int sy = Math.max(y, y + (height / 2 - sprite.getHeight()) / 2);
             g.drawImage(sprite, sx, sy, null);
         }
     }

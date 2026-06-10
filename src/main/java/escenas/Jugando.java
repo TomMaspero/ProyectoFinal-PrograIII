@@ -44,19 +44,16 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     @Override
     public void render(Graphics g) {
         // Fondo y pasto
-        g.drawImage(tileManager.getSprite(2), 0, 0, null);
-        g.drawImage(tileManager.getSprite(3), 76, 17, null);
+        g.drawImage(tileManager.getSprite(0), 0, 0, null);
+        g.drawImage(tileManager.getSprite(1), 76, 17, null);
 
         for (int row = 0; row < lvl.length; row++) {
             for (int col = 0; col < lvl[row].length; col++) {
                 int plantaId = lvl[row][col];
                 if (plantaId != 0) {
-                    g.drawImage(
-                        tileManager.getSpriteByPlantaId(plantaId),
-                        GRID_X + col * CELL_WIDTH,
-                        GRID_Y + row * CELL_HEIGHT,
-                        null
-                    );
+                    java.awt.image.BufferedImage spr = tileManager.getSpriteByPlantaId(plantaId);
+                    int renderY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - spr.getHeight();
+                    g.drawImage(spr, GRID_X + col * CELL_WIDTH, renderY, null);
                 }
             }
         }
@@ -67,14 +64,11 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             int col = (mouseX - GRID_X) / CELL_WIDTH;
             int row = (mouseY - GRID_Y) / CELL_HEIGHT;
             if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
+                java.awt.image.BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(sel);
+                int ghostY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - ghostSpr.getHeight();
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
-                g2d.drawImage(
-                    tileManager.getSpriteByPlantaId(sel),
-                    GRID_X + col * CELL_WIDTH,
-                    GRID_Y + row * CELL_HEIGHT,
-                    null
-                );
+                g2d.drawImage(ghostSpr, GRID_X + col * CELL_WIDTH, ghostY, null);
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
             }
         }
