@@ -66,3 +66,14 @@ public class SpriteManager {
             default -> new BufferedImage[0];
         };
     }
+
+    /**
+     * Crea una animación idle lista para usar.
+     *
+     * @param plantaId     ID de la planta
+     * @param ticksPerFrame Cuántos ticks de juego dura cada frame
+     */
+    public static Animation createIdleAnimation(int plantaId, int ticksPerFrame) {
+        return new Animation(getIdleFrames(plantaId), ticksPerFrame);
+    }
+}
