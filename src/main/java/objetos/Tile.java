@@ -28,7 +28,6 @@ public class Tile {
     public String getNombre() {
         return nombre;
     }
-    
 
     public BufferedImage getSprite(){
         return sprite;

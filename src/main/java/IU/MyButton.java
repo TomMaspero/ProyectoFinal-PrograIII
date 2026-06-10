@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
  * @author lucio
  */
 public class MyButton {
-    private int x,y,width,height;
+    private int x,y,width,height,id;
     private int id = -1;
     private BufferedImage sprite;
     private String text;
@@ -34,6 +34,7 @@ public class MyButton {
         this.width = width;
         this.height = height;
         this.text = text;
+        this.id = -1; // no se usa en este constructor
         
         initBounds();
     }
@@ -45,6 +46,8 @@ public class MyButton {
         this(text, x, y, width, height);
         this.id = id;
         this.sprite = sprite;
+
+        initBounds();
     }
 
     public int getId() { return id; }

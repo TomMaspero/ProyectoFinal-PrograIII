@@ -42,8 +42,8 @@ public class TileManager {
         tiles.add(PASTO  = new Tile(getMediumSprite(0, 0, grassAtlas), id++, "Pasto"));  // ID 1
     }
     /**
-     * Retorna un tile leido desde la lista segun su ID.
-     * @param id ID del tile guardado
+     * Retorna un sprite leido desde la lista segun su ID.
+     * @param id ID del sprite guardado
      * @return 
      */
     public BufferedImage getSprite(int id){
@@ -75,6 +75,14 @@ public class TileManager {
      */
     private BufferedImage getLargeSprite(int xC, int yC, BufferedImage atlas) {
         return atlas.getSubimage(xC, yC, 640, 360);
+    }
+    /**
+     * Devuelve un objeto tile segun el ID especificado en parametro
+     * @param id ID del tile buscado
+     * @return Tile correspondiente al ID
+     */
+    public Tile getTile(int id){
+        return tiles.get(id);
     }
     
     
