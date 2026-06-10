@@ -1,110 +1,102 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package IU;
 
-import escenas.Jugando;
+import entidades.Planta;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.List;
+import managers.TileManager;
 import static main.EstadoJuego.*;
 import static main.EstadoJuego.SetEstadoJuego;
-import objetos.Tile;
 
 /**
- *
- * @author lucio
+ * Barra inferior de la pantalla de juego.
+ * Muestra un botón por cada planta cargada desde la base de datos.
  */
 public class Hotbar {
     private int x, y, width, height;
-    private MyButton bMenu; // Boton para volver al menu
-    private Jugando jugando;
-    private ArrayList<MyButton> tileButtons = new ArrayList<>(); // Aca se guardan los botones de la hotbar
-    private Tile selectedTile;
+    private MyButton bMenu;
+    private ArrayList<MyButton> plantButtons = new ArrayList<>();
+    private int selectedPlantaId = 0; // 0 = ninguna seleccionada
 
-    public Hotbar(int x, int y, int width, int height, Jugando jugando) {
+    public Hotbar(int x, int y, int width, int height, List<Planta> plantas, TileManager tileManager) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.jugando = jugando;
-        initButtons();
+        initButtons(plantas, tileManager);
     }
-    
-    public void draw(Graphics g){
-        // Fondo
-        g.setColor(Color.ORANGE);
-        g.fillRect(x,y,width,height);
-        // Botones
-        drawButtons(g);
-    }
-    
-    private void initButtons() {
-        int i,w,h,xStart,yStart,xOffset;
-        w = 50;
-        h = 50;
-        xStart = 110;
-        yStart = 362;
-        xOffset = (int)(w*1.1f);
-        i=0;
-        bMenu = new MyButton("Menu",2,362,100,30);
-        // Toma los nombres de los tiles y crea botones para guardarlos en el array
-        for(Tile tile : jugando.getTileManager().tiles){
-            tileButtons.add(new MyButton(tile.getNombre(),xStart + xOffset * i,362,50,50,tile.getId()));// utiliza el constructor con id
+
+    private void initButtons(List<Planta> plantas, TileManager tileManager) {
+        bMenu = new MyButton("Menu", 2, y, 100, 30);
+
+        int btnW = 50;
+        int btnH = 50;
+        int xStart = 110;
+        int xOffset = (int)(btnW * 1.1f);
+
+        int i = 0;
+        for (Planta p : plantas) {
+            plantButtons.add(new MyButton(
+                p.getNombre(),
+                p.getPlantaId(),
+                tileManager.getSpriteByPlantaId(p.getPlantaId()),
+                xStart + xOffset * i,
+                y + (height - btnH) / 2,
+                btnW,
+                btnH
+            ));
             i++;
         }
     }
-    
-    private void drawButtons(Graphics g) {
-        bMenu.draw(g);
-        drawTileButtons(g);
-        drawSelectedTile(g);
-    }
-    
-    private void drawSelectedTile(Graphics g) {
-        if(selectedTile != null){
-            // dibuja el sprite a la derecha de la hotbar
-            g.drawImage(selectedTile.getSprite(), 550, 362, null);
-            // se podria dibujar un borde o algo sobre el objeto seleccionado
+
+    public void draw(Graphics g) {
+        // Fondo
+        g.setColor(Color.ORANGE);
+        g.fillRect(x, y, width, height);
+
+        // Resaltar botón seleccionado
+        if (selectedPlantaId != 0) {
+            for (MyButton b : plantButtons) {
+                if (b.getId() == selectedPlantaId) {
+                    g.setColor(Color.YELLOW);
+                    g.fillRect(b.getBounds().x - 2, b.getBounds().y - 2,
+                               b.getBounds().width + 4, b.getBounds().height + 4);
+                }
+            }
         }
-    }
-    
-    private void drawTileButtons(Graphics g) {
-        // Dibuja los botones segun su nombre, sin imagen
-        // en los tutoriales hay una seccion para agregar imagenes
-        
-        for(MyButton b : tileButtons){
-             b.draw(g);
+
+        bMenu.draw(g);
+        for (MyButton b : plantButtons) {
+            b.draw(g);
         }
     }
 
     public void mouseClicked(int x, int y) {
-        if(bMenu.getBounds().contains(x,y)){
+        if (bMenu.getBounds().contains(x, y)) {
             SetEstadoJuego(MENU);
-        }else{
-            for(MyButton b: tileButtons){
-                if(b.getBounds().contains(x,y)){
-                    selectedTile = jugando.getTileManager().getTile(b.getId());
-                    jugando.setSelectedTile(selectedTile);
-                    return;
-                }
+            return;
+        }
+        for (MyButton b : plantButtons) {
+            if (b.getBounds().contains(x, y)) {
+                // Toggle: clickear el mismo botón deselecciona
+                selectedPlantaId = (selectedPlantaId == b.getId()) ? 0 : b.getId();
+                return;
             }
         }
     }
 
-
     public void mouseMoved(int x, int y) {
-        for(MyButton b : tileButtons){
-                b.setMouseOver(false);
-            }
         bMenu.setMouseOver(false);
-        
-        if(bMenu.getBounds().contains(x,y)){
+        for (MyButton b : plantButtons) {
+            b.setMouseOver(false);
+        }
+
+        if (bMenu.getBounds().contains(x, y)) {
             bMenu.setMouseOver(true);
-        }else{
-            for(MyButton b : tileButtons){
-                if(b.getBounds().contains(x,y)){
+        } else {
+            for (MyButton b : plantButtons) {
+                if (b.getBounds().contains(x, y)) {
                     b.setMouseOver(true);
                     return;
                 }
@@ -112,33 +104,28 @@ public class Hotbar {
         }
     }
 
-
     public void mousePressed(int x, int y) {
-        if(bMenu.getBounds().contains(x,y)){
+        if (bMenu.getBounds().contains(x, y)) {
             bMenu.setMousePressed(true);
-        }else{
-        for(MyButton b : tileButtons){
-            if(b.getBounds().contains(x,y)){
-             b.setMousePressed(true);
-             return;
-            }
+        } else {
+            for (MyButton b : plantButtons) {
+                if (b.getBounds().contains(x, y)) {
+                    b.setMousePressed(true);
+                    return;
+                }
             }
         }
     }
 
-
     public void mouseReleased(int x, int y) {
-        resetButtons();
-    }
-    
-    private void resetButtons() {
-        bMenu.resetBooleans();    
-        for(MyButton b : tileButtons){
-                b.resetBooleans();
-            }
+        bMenu.resetBooleans();
+        for (MyButton b : plantButtons) {
+            b.resetBooleans();
+        }
     }
 
-    
-
-    
+    /** Devuelve el plantaId seleccionado actualmente (0 = ninguno). */
+    public int getSelectedPlantaId() {
+        return selectedPlantaId;
+    }
 }

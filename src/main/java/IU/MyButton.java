@@ -7,6 +7,7 @@ package IU;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 /**
  * Clase base para definir los botones en la IU del juego
@@ -14,6 +15,8 @@ import java.awt.Rectangle;
  */
 public class MyButton {
     private int x,y,width,height,id;
+    private int id = -1;
+    private BufferedImage sprite;
     private String text;
     private Rectangle bounds;
     private boolean mouseOver, mousePressed;
@@ -36,21 +39,18 @@ public class MyButton {
         initBounds();
     }
     
-    // Constructor para botones de la hotbar, agrega ID
-    public MyButton(String text,int x, int y, int width, int height, int id) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.text = text;
+    /**
+     * Constructor para botones de la hotbar con ID de planta y sprite.
+     */
+    public MyButton(String text, int id, BufferedImage sprite, int x, int y, int width, int height) {
+        this(text, x, y, width, height);
         this.id = id;
-        
+        this.sprite = sprite;
+
         initBounds();
     }
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
 
     private void initBounds() {
         this.bounds = new Rectangle(x,y,width,height);
@@ -72,12 +72,21 @@ public class MyButton {
         }else
             g.setColor(Color.WHITE);
         g.fillRect(x,y,width,height);
+
+        if (sprite != null) {
+            // Centra el sprite en la mitad superior del botón; clamp para no salir del borde
+            int sx = x + (width  - sprite.getWidth())  / 2;
+            int sy = Math.max(y, y + (height / 2 - sprite.getHeight()) / 2);
+            g.drawImage(sprite, sx, sy, null);
+        }
     }
-    
+
     private void drawText(Graphics g){
         int w = g.getFontMetrics().stringWidth(text);
         g.setColor(Color.BLACK);
-        g.drawString(text, x + width / 2 - w / 2, y + height / 2);
+        // Si hay sprite, el texto va en la mitad inferior; si no, centrado
+        int textY = (sprite != null) ? y + height - 4 : y + height / 2;
+        g.drawString(text, x + width / 2 - w / 2, textY);
     }
     
     private void drawBorder(Graphics g) {

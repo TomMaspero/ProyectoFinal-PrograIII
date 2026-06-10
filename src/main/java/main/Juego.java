@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import Database.*;
 import dao.*;
+import managers.SpriteManager;
 
 
 /**
@@ -53,7 +54,9 @@ public class Juego extends JFrame implements Runnable{
         partidaDAO       = new PartidaDAO(dbManager);
         puntajeDAO       = new PuntajeDAO(dbManager);
         configuracionDAO = new ConfiguracionDAO(dbManager);
-        plantaDAO = new PlantaDAO(dbManager);
+        plantaDAO        = new PlantaDAO(dbManager);
+
+        SpriteManager.loadAll(); // Cargar todos los sprites antes de crear escenas
 
         initClases();
         

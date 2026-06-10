@@ -1,51 +1,81 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package escenas;
 
 import IU.Hotbar;
+import entidades.Planta;
 import helpers.EditorNivel;
+import java.awt.AlphaComposite;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.List;
 import main.Juego;
 import managers.TileManager;
 import objetos.Tile;
 
 /**
- *
- * @author lucio
+ * Escena principal del juego.
+ * Maneja el grid de tiles, la hotbar de plantas y la colocación de plantas.
  */
-public class Jugando extends EscenaJuego implements MetodosEscena{
-    private int[][] lvl; // Array de numeros que representan los tiles del nivel cargado
+public class Jugando extends EscenaJuego implements MetodosEscena {
+
+    // Grid: 0 = vacío, valor > 0 = plantaId de la planta colocada
+    private int[][] lvl;
     private TileManager tileManager;
     private Hotbar hotbar;
     private Tile selectedTile;
     private int mouseX,mouseY;
     private boolean drawSelect;
-    
-    
+
+    // Constantes del grid
+    private static final int GRID_X      = 78;
+    private static final int GRID_Y      = 19;
+    private static final int CELL_WIDTH  = 29;
+    private static final int CELL_HEIGHT = 31;
+    private static final int GRID_COLS   = 8;
+    private static final int GRID_ROWS   = 4;
+
     public Jugando(Juego juego) {
         super(juego);
-        
         lvl = EditorNivel.getLevelData();
         tileManager = new TileManager();
-        hotbar = new Hotbar(0,360,640,100,this);
-        // Nivel
-        // Tile Manager
+
+        List<Planta> plantas = juego.getPlantaDAO().findAll();
+        hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
     }
 
     @Override
     public void render(Graphics g) {
-        g.drawImage(tileManager.getSprite(2),0,0,null); // Dibuja jardin
-        g.drawImage(tileManager.getSprite(3),76,17, null); // Dibuja pasto
-       for(int y = 0; y < lvl.length; y++){ // Dibuja planta y girasol segun lvl
-           for(int x = 0; x<lvl[y].length;x++){
-               int id = lvl[y][x]; 
-               g.drawImage(tileManager.getSprite(id), 78+x*29, 19+y*31, null);
-           }
-       }
-       
-       hotbar.draw(g);
+        // Fondo y pasto
+        g.drawImage(tileManager.getSprite(0), 0, 0, null);
+        g.drawImage(tileManager.getSprite(1), 76, 17, null);
+
+        for (int row = 0; row < lvl.length; row++) {
+            for (int col = 0; col < lvl[row].length; col++) {
+                int plantaId = lvl[row][col];
+                if (plantaId != 0) {
+                    java.awt.image.BufferedImage spr = tileManager.getSpriteByPlantaId(plantaId);
+                    int renderY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - spr.getHeight();
+                    g.drawImage(spr, GRID_X + col * CELL_WIDTH, renderY, null);
+                }
+            }
+        }
+
+        // Ghost preview: planta seleccionada siguiendo el cursor sobre el grid
+        int sel = hotbar.getSelectedPlantaId();
+        if (sel != 0) {
+            int col = (mouseX - GRID_X) / CELL_WIDTH;
+            int row = (mouseY - GRID_Y) / CELL_HEIGHT;
+            if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
+                java.awt.image.BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(sel);
+                int ghostY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - ghostSpr.getHeight();
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
+                g2d.drawImage(ghostSpr, GRID_X + col * CELL_WIDTH, ghostY, null);
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+            }
+        }
+
+        // Hotbar
+        hotbar.draw(g);
        drawSelectedTile(g);
     }
     
@@ -59,22 +89,34 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
         this.selectedTile = tile;
         drawSelect = true;
     }
-    
-    public TileManager getTileManager(){
+
+    public TileManager getTileManager() {
         return tileManager;
     }
-    
 
     @Override
     public void mouseClicked(int x, int y) {
-        if(y>=360){
+        if (y >= 360) {
             hotbar.mouseClicked(x, y);
+        } else {
+            // Intentar colocar planta en el grid
+            int sel = hotbar.getSelectedPlantaId();
+            if (sel != 0) {
+                int col = (x - GRID_X) / CELL_WIDTH;
+                int row = (y - GRID_Y) / CELL_HEIGHT;
+                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
+                        && lvl[row][col] == 0) {
+                    lvl[row][col] = sel;
+                }
+            }
         }
     }
 
     @Override
     public void mouseMoved(int x, int y) {
-        if(y>=360){
+        mouseX = x;
+        mouseY = y;
+        if (y >= 360) {
             hotbar.mouseMoved(x, y);
             drawSelect = false;
         }else{
@@ -87,16 +129,13 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
 
     @Override
     public void mousePressed(int x, int y) {
-         if(y>=360){
+        if (y >= 360) {
             hotbar.mousePressed(x, y);
         }
     }
 
     @Override
     public void mouseReleased(int x, int y) {
-            hotbar.mouseReleased(x, y);
+        hotbar.mouseReleased(x, y);
     }
-
-    
-    
 }

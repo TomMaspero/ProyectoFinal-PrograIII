@@ -14,9 +14,9 @@ import objetos.Tile;
  * @author lucio
  */
 public class TileManager {
-    
-    public Tile PASTO,CAMINO,AGUA,PLANTA,GIRASOL,JARDIN;
-    public BufferedImage peaAtlas,sunAtlas,gardenAtlas,grassAtlas; // Temporal - Se crean atlas distintos segun objeto/entidad
+
+    public Tile PASTO, JARDIN;
+    private BufferedImage gardenAtlas, grassAtlas;
     public ArrayList<Tile> tiles = new ArrayList<>(); // Arraylist que contiene todos los tiles del juego
 
     public TileManager() {
@@ -24,23 +24,22 @@ public class TileManager {
         createTiles();
     }
     /**
-     * Se especifican las cargas de atlas para los tiles.
+     * Carga los atlas de tiles de fondo.
+     * Los sprites de plantas los gestiona SpriteManager.
      */
     private void loadAtlas() {
-        peaAtlas = CargaGuarda.getSpriteAtlas("pea.png");
-        sunAtlas = CargaGuarda.getSpriteAtlas("sunflower.png");
         gardenAtlas = CargaGuarda.getSpriteAtlas("garden_escalado.png");
-        grassAtlas = CargaGuarda.getSpriteAtlas("pasto_t.png");
+        grassAtlas  = CargaGuarda.getSpriteAtlas("pasto_t.png");
     }
     /**
-     * Genera y guarda los tiles leidos desde los atlas en un nuevo tile almacenado en la lista.
+     * Genera los tiles de fondo.
+     *   tiles[0] = JARDIN
+     *   tiles[1] = PASTO
      */
     private void createTiles() {
         int id = 0;
-        tiles.add(PLANTA = new Tile(getSprite(169,13,peaAtlas),id++,"Planta")); // ID 0
-        tiles.add(GIRASOL = new Tile(getSprite(237,120,sunAtlas),id++,"Girasol")); // ID 1
-        tiles.add(JARDIN = new Tile(getLargeSprite(0,0,gardenAtlas),id++,"Jardin")); // ID 2
-        tiles.add(PASTO = new Tile(getMediumSprite(0,0,grassAtlas),id++,"Pasto")); // ID 3
+        tiles.add(JARDIN = new Tile(getLargeSprite(0, 0, gardenAtlas),  id++, "Jardin")); // ID 0
+        tiles.add(PASTO  = new Tile(getMediumSprite(0, 0, grassAtlas), id++, "Pasto"));  // ID 1
     }
     /**
      * Retorna un sprite leido desde la lista segun su ID.
@@ -49,6 +48,15 @@ public class TileManager {
      */
     public BufferedImage getSprite(int id){
         return tiles.get(id).getSprite();
+    }
+
+    /**
+     * Retorna el sprite estático de una planta según su plantaId de la base de datos.
+     * Delega a SpriteManager — debe haberse llamado SpriteManager.loadAll() antes.
+     * @param plantaId ID de la planta en la tabla 'plantas' (1=Peashooter, 2=Sunflower)
+     */
+    public BufferedImage getSpriteByPlantaId(int plantaId) {
+        return SpriteManager.getStaticSprite(plantaId);
     }
     /**
      * Retorna un tile pequeño segun coordenadas y su atlas.
