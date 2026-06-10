@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
  * @author lucio
  */
 public class MyButton {
-    private int x,y,width,height,id;
+    private int x,y,width,height;
     private int id = -1;
     private BufferedImage sprite;
     private String text;
