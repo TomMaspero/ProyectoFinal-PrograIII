@@ -9,6 +9,7 @@ import helpers.EditorNivel;
 import java.awt.Graphics;
 import main.Juego;
 import managers.TileManager;
+import objetos.Tile;
 
 /**
  *
@@ -18,6 +19,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
     private int[][] lvl; // Array de numeros que representan los tiles del nivel cargado
     private TileManager tileManager;
     private Hotbar hotbar;
+    private Tile selectedTile;
+    private int mouseX,mouseY;
+    private boolean drawSelect;
     
     
     public Jugando(Juego juego) {
@@ -42,6 +46,18 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
        }
        
        hotbar.draw(g);
+       drawSelectedTile(g);
+    }
+    
+    private void drawSelectedTile(Graphics g) {
+        if(selectedTile != null && drawSelect){
+        g.drawImage(selectedTile.getSprite(),mouseX,mouseY,null);
+        }
+    }
+    
+    public void setSelectedTile(Tile tile){
+        this.selectedTile = tile;
+        drawSelect = true;
     }
     
     public TileManager getTileManager(){
@@ -60,6 +76,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
     public void mouseMoved(int x, int y) {
         if(y>=360){
             hotbar.mouseMoved(x, y);
+            drawSelect = false;
+        }else{
+            drawSelect = true;
+            // dibuja en tiles de 32x32
+            mouseX = (x / 32) * 32;
+            mouseY = (y / 32) * 32;
         }
     }
 
@@ -74,5 +96,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena{
     public void mouseReleased(int x, int y) {
             hotbar.mouseReleased(x, y);
     }
+
+    
     
 }

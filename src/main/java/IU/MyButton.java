@@ -13,7 +13,7 @@ import java.awt.Rectangle;
  * @author lucio
  */
 public class MyButton {
-    private int x,y,width,height;
+    private int x,y,width,height,id;
     private String text;
     private Rectangle bounds;
     private boolean mouseOver, mousePressed;
@@ -31,12 +31,26 @@ public class MyButton {
         this.width = width;
         this.height = height;
         this.text = text;
+        this.id = -1; // no se usa en este constructor
         
         initBounds();
     }
     
-    // Hay que agregar otro constructor para botones de la hotbar, agregando id
-    
+    // Constructor para botones de la hotbar, agrega ID
+    public MyButton(String text,int x, int y, int width, int height, int id) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.text = text;
+        this.id = id;
+        
+        initBounds();
+    }
+
+    public int getId() {
+        return id;
+    }
 
     private void initBounds() {
         this.bounds = new Rectangle(x,y,width,height);

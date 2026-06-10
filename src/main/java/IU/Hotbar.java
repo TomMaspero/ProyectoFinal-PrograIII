@@ -20,7 +20,8 @@ public class Hotbar {
     private int x, y, width, height;
     private MyButton bMenu; // Boton para volver al menu
     private Jugando jugando;
-    private ArrayList<MyButton> tileButtons = new ArrayList<>(); // Aca se guardan los botones de colocar de la hotbar
+    private ArrayList<MyButton> tileButtons = new ArrayList<>(); // Aca se guardan los botones de la hotbar
+    private Tile selectedTile;
 
     public Hotbar(int x, int y, int width, int height, Jugando jugando) {
         this.x = x;
@@ -48,9 +49,9 @@ public class Hotbar {
         xOffset = (int)(w*1.1f);
         i=0;
         bMenu = new MyButton("Menu",2,362,100,30);
-        
+        // Toma los nombres de los tiles y crea botones para guardarlos en el array
         for(Tile tile : jugando.getTileManager().tiles){
-            tileButtons.add(new MyButton(tile.getNombre(),xStart + xOffset * i,362,50,50));
+            tileButtons.add(new MyButton(tile.getNombre(),xStart + xOffset * i,362,50,50,tile.getId()));// utiliza el constructor con id
             i++;
         }
     }
@@ -58,7 +59,15 @@ public class Hotbar {
     private void drawButtons(Graphics g) {
         bMenu.draw(g);
         drawTileButtons(g);
-        
+        drawSelectedTile(g);
+    }
+    
+    private void drawSelectedTile(Graphics g) {
+        if(selectedTile != null){
+            // dibuja el sprite a la derecha de la hotbar
+            g.drawImage(selectedTile.getSprite(), 550, 362, null);
+            // se podria dibujar un borde o algo sobre el objeto seleccionado
+        }
     }
     
     private void drawTileButtons(Graphics g) {
@@ -73,6 +82,14 @@ public class Hotbar {
     public void mouseClicked(int x, int y) {
         if(bMenu.getBounds().contains(x,y)){
             SetEstadoJuego(MENU);
+        }else{
+            for(MyButton b: tileButtons){
+                if(b.getBounds().contains(x,y)){
+                    selectedTile = jugando.getTileManager().getTile(b.getId());
+                    jugando.setSelectedTile(selectedTile);
+                    return;
+                }
+            }
         }
     }
 
@@ -120,6 +137,8 @@ public class Hotbar {
                 b.resetBooleans();
             }
     }
+
+    
 
     
 }
