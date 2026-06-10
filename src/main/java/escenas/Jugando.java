@@ -9,7 +9,6 @@ import java.awt.Graphics2D;
 import java.util.List;
 import main.Juego;
 import managers.TileManager;
-import objetos.Tile;
 
 /**
  * Escena principal del juego.
@@ -21,9 +20,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int[][] lvl;
     private TileManager tileManager;
     private Hotbar hotbar;
-    private Tile selectedTile;
-    private int mouseX,mouseY;
-    private boolean drawSelect;
+    private int mouseX, mouseY;
 
     // Constantes del grid
     private static final int GRID_X      = 78;
@@ -47,7 +44,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Fondo y pasto
         g.drawImage(tileManager.getSprite(0), 0, 0, null);
         g.drawImage(tileManager.getSprite(1), 76, 17, null);
-
+ 
         for (int row = 0; row < lvl.length; row++) {
             for (int col = 0; col < lvl[row].length; col++) {
                 int plantaId = lvl[row][col];
@@ -59,35 +56,38 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             }
         }
 
-        // Ghost preview: planta seleccionada siguiendo el cursor sobre el grid
-        int sel = hotbar.getSelectedPlantaId();
-        if (sel != 0) {
+        // Ghost / drag preview: planta seleccionada siguiendo el cursor
+        int plantaSeleccionadaId = hotbar.getSelectedPlantaId();
+        if (plantaSeleccionadaId != 0) {
+            java.awt.image.BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(plantaSeleccionadaId);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
+
             int col = (mouseX - GRID_X) / CELL_WIDTH;
             int row = (mouseY - GRID_Y) / CELL_HEIGHT;
-            if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
-                java.awt.image.BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(sel);
-                int ghostY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - ghostSpr.getHeight();
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
-                g2d.drawImage(ghostSpr, GRID_X + col * CELL_WIDTH, ghostY, null);
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+            boolean overGrid = col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS;
+
+            if (overGrid) {
+                // Snapeado a la celda más cercana
+                g2d.drawImage(ghostSpr,
+                    GRID_X + col * CELL_WIDTH,
+                    GRID_Y + row * CELL_HEIGHT,
+                    CELL_WIDTH, CELL_HEIGHT,
+                    null);
+            } else {
+                // Fuera del grid: sigue el cursor libremente (centrado en el puntero)
+                g2d.drawImage(ghostSpr,
+                    mouseX - CELL_WIDTH  / 2,
+                    mouseY - CELL_HEIGHT / 2,
+                    CELL_WIDTH, CELL_HEIGHT,
+                    null);
             }
+
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
 
         // Hotbar
         hotbar.draw(g);
-       drawSelectedTile(g);
-    }
-    
-    private void drawSelectedTile(Graphics g) {
-        if(selectedTile != null && drawSelect){
-        g.drawImage(selectedTile.getSprite(),mouseX,mouseY,null);
-        }
-    }
-    
-    public void setSelectedTile(Tile tile){
-        this.selectedTile = tile;
-        drawSelect = true;
     }
 
     public TileManager getTileManager() {
@@ -118,12 +118,6 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         mouseY = y;
         if (y >= 360) {
             hotbar.mouseMoved(x, y);
-            drawSelect = false;
-        }else{
-            drawSelect = true;
-            // dibuja en tiles de 32x32
-            mouseX = (x / 32) * 32;
-            mouseY = (y / 32) * 32;
         }
     }
 
