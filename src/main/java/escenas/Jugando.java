@@ -2,6 +2,7 @@ package escenas;
 
 import IU.Hotbar;
 import entidades.Planta;
+import helpers.CargaGuarda;
 import helpers.EditorNivel;
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
@@ -37,13 +38,43 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         List<Planta> plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
+        
+        //CargaGuarda.CreateFile();
+        //CargaGuarda.WriteToFile();
+        //CargaGuarda.ReadFromFile();
+        
+        createDefaultLevel();
+        loadDefaultLevel();
     }
+    /**
+     * Carga el nivel definindo como predeterminado desde un archivo.
+     */
+    private void loadDefaultLevel() {
+        lvl = CargaGuarda.GetLevelData("default_lvl");
+    }
+    /**
+     * Crea un nivel predeterminado con tiles en blanco(ID = 0)
+     */
+    private void createDefaultLevel() {
+        int[] arr = new int[45]; // Campo 5 x 9
+        for(int i = 0; i < arr.length; i++){
+            arr[i] = 0;
+        }
+        
+        CargaGuarda.CreateLevel("default_lvl", arr);
+    }
+    /*
+    En el tutorial(ep. 8 p.2) hay una seccion para guardar el nivel actual,
+    pero siempre el nivel esta en blanco al empezar asi
+    que no se implementa.
+    */
+    
+    
 
     @Override
     public void render(Graphics g) {
-        // Fondo y pasto
+        // Dibuja jardin
         g.drawImage(tileManager.getSprite(0), 0, 0, null);
-        g.drawImage(tileManager.getSprite(1), 76, 17, null);
  
         for (int row = 0; row < lvl.length; row++) {
             for (int col = 0; col < lvl[row].length; col++) {
@@ -132,4 +163,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     public void mouseReleased(int x, int y) {
         hotbar.mouseReleased(x, y);
     }
+
+    
+
+    
 }

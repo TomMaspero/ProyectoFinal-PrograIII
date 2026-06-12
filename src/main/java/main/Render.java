@@ -9,7 +9,6 @@ import java.awt.Graphics;
 /**
  * Se encarga del renderizado principal del juego.
  * @param juego Se pasa el juego como parametro. Luego se utiliza para indicar sus escenas.
- * @author lucio
  */
 public class Render {
     private Juego juego;

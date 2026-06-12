@@ -15,8 +15,8 @@ import objetos.Tile;
  */
 public class TileManager {
 
-    public Tile PASTO, JARDIN;
-    private BufferedImage gardenAtlas, grassAtlas;
+    public Tile JARDIN;
+    private BufferedImage gardenAtlas;
     public ArrayList<Tile> tiles = new ArrayList<>(); // Arraylist que contiene todos los tiles del juego
 
     public TileManager() {
@@ -28,8 +28,7 @@ public class TileManager {
      * Los sprites de plantas los gestiona SpriteManager.
      */
     private void loadAtlas() {
-        gardenAtlas = CargaGuarda.getSpriteAtlas("garden_escalado.png");
-        grassAtlas  = CargaGuarda.getSpriteAtlas("pasto_t.png");
+        gardenAtlas = CargaGuarda.getSpriteAtlas("yard_resize.png");
     }
     /**
      * Genera los tiles de fondo.
@@ -39,7 +38,6 @@ public class TileManager {
     private void createTiles() {
         int id = 0;
         tiles.add(JARDIN = new Tile(getLargeSprite(0, 0, gardenAtlas),  id++, "Jardin")); // ID 0
-        tiles.add(PASTO  = new Tile(getMediumSprite(0, 0, grassAtlas), id++, "Pasto"));  // ID 1
     }
     /**
      * Retorna un sprite leido desde la lista segun su ID.
