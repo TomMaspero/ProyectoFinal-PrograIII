@@ -9,6 +9,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.List;
 import main.Juego;
+import managers.EnemyManager;
 import managers.TileManager;
 
 /**
@@ -21,6 +22,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int[][] lvl;
     private TileManager tileManager;
     private Hotbar hotbar;
+    private EnemyManager enemyManager;
     private int mouseX, mouseY;
 
     // Constantes del grid
@@ -39,6 +41,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         List<Planta> plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
         
+        enemyManager = new EnemyManager(this);
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -119,6 +122,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         // Hotbar
         hotbar.draw(g);
+        
+        enemyManager.draw(g);
     }
 
     public TileManager getTileManager() {
