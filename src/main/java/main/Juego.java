@@ -3,12 +3,6 @@ package main;
 import escenas.Ajustes;
 import escenas.Jugando;
 import escenas.Menu;
-import inputs.KeyboardListener;
-import inputs.MyMouseListener;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import Database.*;
 import dao.*;
@@ -94,6 +88,7 @@ public class Juego extends JFrame implements Runnable{
         
         // Renderizado
         while (true) {
+            
             long now = System.nanoTime();
             if (now - lastFrame >= timePerFrame) { // Si el tiempo entre frames es mayor o igual al establecido
                 repaint(); // Redibujo la pantalla
@@ -104,6 +99,8 @@ public class Juego extends JFrame implements Runnable{
             if (now - lastUpdate >= timePerUpdate) {
                 lastUpdate = now;
                 updates++;
+                updateGame(); // Por ahora se encarga de actualizar la posicion
+                               // de los enemigos
             }
             // Estadisticas
             
@@ -113,6 +110,15 @@ public class Juego extends JFrame implements Runnable{
                 updates = 0;
                 lastTimeCheck = System.currentTimeMillis();
             }
+        }
+    }
+    
+    private void updateGame(){
+        switch(EstadoJuego.estadoJuego){
+                case MENU: break;
+                case JUGANDO: jugando.update();break;
+                case AJUSTES: break;
+                default: break;
         }
     }
 

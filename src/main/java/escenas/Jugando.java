@@ -72,7 +72,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     que no se implementa.
     */
     
-    
+    public void update(){
+        enemyManager.update();
+    }
 
     @Override
     public void render(Graphics g) {
@@ -144,6 +146,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                         && lvl[row][col] == 0) {
                     lvl[row][col] = sel;
                 }
+            }else{
+            // TEST DE AGREGAR ENEMIGO
+                enemyManager.agregaEnemigo(x,y);
             }
         }
     }

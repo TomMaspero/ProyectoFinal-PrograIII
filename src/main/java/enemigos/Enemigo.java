@@ -25,6 +25,11 @@ public class Enemigo {
         this.tipoEnemigo = tipoEnemigo;
         colision = new Rectangle((int) x,(int) y, 32, 32); // Los ultimos 2 hay q setearlos segun el tamaño del sprite
     }
+    
+    public void mover(float x, float y){
+        this.x += x;
+        this.y += y;
+    }
 
     public float getX() {
         return x;

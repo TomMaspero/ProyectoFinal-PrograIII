@@ -9,6 +9,7 @@ import escenas.Jugando;
 import enemigos.Enemigo;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  *
@@ -17,13 +18,18 @@ import java.awt.image.BufferedImage;
 public class EnemyManager {
     private Jugando jugando;
     private BufferedImage[] imgEnemigos;
-    private Enemigo testEnemigo;
+    private ArrayList<Enemigo> enemigos = new ArrayList<>();
     
     public EnemyManager(Jugando jugando){
         this.jugando = jugando;
         imgEnemigos = new BufferedImage[5]; // 5 Sprites max para enemigos
-        testEnemigo = new Enemigo(100, 100, 0, 0); // Reemplazar por coordenadas reales de pantalla.
         cargarImgEnemigos();
+    }
+    
+    public void agregaEnemigo(int x, int y){
+        enemigos.add(new Enemigo(x, y, 0, 0)); 
+        // Reemplazar por coordenadas reales de pantalla.
+        // Se usa en Jugando -> mouseClicked para un test de spawneo                                        
     }
     
     private void cargarImgEnemigos() {
@@ -32,11 +38,13 @@ public class EnemyManager {
     }
     
     public void update(){
-    
+        for(Enemigo e : enemigos)
+            e.mover(0.5f, 0);
     }
     
     public void draw(Graphics g){
-        dibujaEnemigo(testEnemigo,g);
+        for(Enemigo e : enemigos)
+            dibujaEnemigo(e,g);
     }
     
     private void dibujaEnemigo(Enemigo e, Graphics g){
