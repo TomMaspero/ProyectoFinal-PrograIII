@@ -5,8 +5,12 @@ import entidades.Planta;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
 import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
@@ -25,13 +29,25 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private EnemyManager enemyManager;
     private int mouseX, mouseY;
 
-    // Constantes del grid
-    private static final int GRID_X      = 78;
-    private static final int GRID_Y      = 19;
-    private static final int CELL_WIDTH  = 29;
-    private static final int CELL_HEIGHT = 31;
-    private static final int GRID_COLS   = 8;
-    private static final int GRID_ROWS   = 4;
+    // Debug grid overlay
+    private boolean showDebugGrid = false;
+    private static final Rectangle DEBUG_BTN = new Rectangle(565, 4, 70, 14);
+
+    // Constantes del grid — calibradas sobre yard_resize.png (640×360)
+    // Área de pasto: x=112–454 (9×38px), y=42–342 (5×60px)
+    private static final int GRID_X      = 112;
+    private static final int GRID_Y      = 42;
+    private static final int CELL_WIDTH  = 38;
+    private static final int CELL_HEIGHT = 60;
+    private static final int GRID_COLS   = 9;
+    private static final int GRID_ROWS   = 5;
+
+    // Tamaño de render de los sprites (75% de la celda)
+    private static final int SPRITE_W = Math.round(CELL_WIDTH  * 0.8f); // 29
+    private static final int SPRITE_H = Math.round(CELL_HEIGHT * 0.6f); // 45
+    // Offsets para centrar horizontalmente y alinear por la base
+    private static final int SPRITE_OFF_X = (CELL_WIDTH  - SPRITE_W) / 2;
+    private static final int SPRITE_OFF_Y =  CELL_HEIGHT - SPRITE_H - 8;
 
     public Jugando(Juego juego) {
         super(juego);
@@ -81,13 +97,17 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Dibuja jardin
         g.drawImage(tileManager.getSprite(0), 0, 0, null);
  
+        // Dibuja las plantas
         for (int row = 0; row < lvl.length; row++) {
             for (int col = 0; col < lvl[row].length; col++) {
                 int plantaId = lvl[row][col];
                 if (plantaId != 0) {
-                    java.awt.image.BufferedImage spr = tileManager.getSpriteByPlantaId(plantaId);
-                    int renderY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - spr.getHeight();
-                    g.drawImage(spr, GRID_X + col * CELL_WIDTH, renderY, null);
+                    BufferedImage spr = tileManager.getSpriteByPlantaId(plantaId);
+                    g.drawImage(spr,
+                        GRID_X + col * CELL_WIDTH  + SPRITE_OFF_X,
+                        GRID_Y + row * CELL_HEIGHT + SPRITE_OFF_Y,
+                        SPRITE_W, SPRITE_H,
+                        null);
                 }
             }
         }
@@ -95,7 +115,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Ghost / drag preview: planta seleccionada siguiendo el cursor
         int plantaSeleccionadaId = hotbar.getSelectedPlantaId();
         if (plantaSeleccionadaId != 0) {
-            java.awt.image.BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(plantaSeleccionadaId);
+            BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(plantaSeleccionadaId);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
 
@@ -104,18 +124,18 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             boolean overGrid = col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS;
 
             if (overGrid) {
-                // Snapeado a la celda más cercana
+                // Snapeado a la celda más cercana, alineado por la base
                 g2d.drawImage(ghostSpr,
-                    GRID_X + col * CELL_WIDTH,
-                    GRID_Y + row * CELL_HEIGHT,
-                    CELL_WIDTH, CELL_HEIGHT,
+                    GRID_X + col * CELL_WIDTH  + SPRITE_OFF_X,
+                    GRID_Y + row * CELL_HEIGHT + SPRITE_OFF_Y,
+                    SPRITE_W, SPRITE_H,
                     null);
             } else {
                 // Fuera del grid: sigue el cursor libremente (centrado en el puntero)
                 g2d.drawImage(ghostSpr,
-                    mouseX - CELL_WIDTH  / 2,
-                    mouseY - CELL_HEIGHT / 2,
-                    CELL_WIDTH, CELL_HEIGHT,
+                    mouseX - SPRITE_W / 2,
+                    mouseY - SPRITE_H / 2,
+                    SPRITE_W, SPRITE_H,
                     null);
             }
 
@@ -124,8 +144,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         // Hotbar
         hotbar.draw(g);
-        
+
         enemyManager.draw(g);
+
+        // Debug overlay (siempre encima de todo)
+        if (showDebugGrid) drawDebugGrid(g);
+        drawDebugToggle(g);
     }
 
     public TileManager getTileManager() {
@@ -134,6 +158,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     @Override
     public void mouseClicked(int x, int y) {
+        if (DEBUG_BTN.contains(x, y)) {
+            showDebugGrid = !showDebugGrid;
+            return;
+        }
         if (y >= 360) {
             hotbar.mouseClicked(x, y);
         } else {
@@ -174,7 +202,58 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         hotbar.mouseReleased(x, y);
     }
 
-    
+    // ── Debug helpers ────────────────────────────────────────────────────────
 
-    
+    private void drawDebugToggle(Graphics g) {
+        g.setColor(showDebugGrid ? new Color(200, 0, 0) : new Color(60, 60, 60));
+        g.fillRect(DEBUG_BTN.x, DEBUG_BTN.y, DEBUG_BTN.width, DEBUG_BTN.height);
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.PLAIN, 9));
+        String label = showDebugGrid ? "Grid: ON" : "Grid: OFF";
+        int lw = g.getFontMetrics().stringWidth(label);
+        g.drawString(label, DEBUG_BTN.x + (DEBUG_BTN.width - lw) / 2,
+                            DEBUG_BTN.y + DEBUG_BTN.height - 3);
+    }
+
+    private void drawDebugGrid(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        Font labelFont = new Font("Arial", Font.BOLD, 7);
+        g2d.setFont(labelFont);
+
+        for (int row = 0; row < GRID_ROWS; row++) {
+            for (int col = 0; col < GRID_COLS; col++) {
+                int cx = GRID_X + col * CELL_WIDTH;
+                int cy = GRID_Y + row * CELL_HEIGHT;
+
+                // Semi-transparent red fill
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.18f));
+                g2d.setColor(Color.RED);
+                g2d.fillRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
+
+                // Solid red border
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+                g2d.setColor(Color.RED);
+                g2d.drawRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
+
+                // Label: (col,row) on top, lvl value below
+                g2d.setColor(Color.YELLOW);
+                String pos = col + "," + row;
+                int pw = g2d.getFontMetrics().stringWidth(pos);
+                g2d.drawString(pos, cx + (CELL_WIDTH - pw) / 2, cy + 8);
+
+                if (lvl != null && row < lvl.length && col < lvl[row].length) {
+                    String val = "id:" + lvl[row][col];
+                    int vw = g2d.getFontMetrics().stringWidth(val);
+                    g2d.setColor(Color.WHITE);
+                    g2d.drawString(val, cx + (CELL_WIDTH - vw) / 2, cy + CELL_HEIGHT - 2);
+                }
+            }
+        }
+
+        // Grid origin marker
+        g2d.setColor(Color.CYAN);
+        g2d.fillOval(GRID_X - 3, GRID_Y - 3, 6, 6);
+        g2d.setColor(Color.CYAN);
+        g2d.drawString("(" + GRID_X + "," + GRID_Y + ")", GRID_X + 5, GRID_Y - 2);
+    }
 }
