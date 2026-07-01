@@ -32,13 +32,14 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private boolean showDebugGrid = false;
     private static final Rectangle DEBUG_BTN = new Rectangle(565, 4, 70, 14);
 
-    // Constantes del grid
-    private static final int GRID_X      = 78;
-    private static final int GRID_Y      = 19;
-    private static final int CELL_WIDTH  = 29;
-    private static final int CELL_HEIGHT = 31;
-    private static final int GRID_COLS   = 8;
-    private static final int GRID_ROWS   = 4;
+    // Constantes del grid — calibradas sobre yard_resize.png (640×360)
+    // Área de pasto: x=112–454 (9×38px), y=42–342 (5×60px)
+    private static final int GRID_X      = 112;
+    private static final int GRID_Y      = 42;
+    private static final int CELL_WIDTH  = 38;
+    private static final int CELL_HEIGHT = 60;
+    private static final int GRID_COLS   = 9;
+    private static final int GRID_ROWS   = 5;
 
     public Jugando(Juego juego) {
         super(juego);
