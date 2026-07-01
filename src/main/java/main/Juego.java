@@ -6,6 +6,7 @@ import escenas.Menu;
 import javax.swing.JFrame;
 import Database.*;
 import dao.*;
+import javax.swing.ImageIcon;
 import managers.SpriteManager;
 
 
@@ -40,6 +41,7 @@ public class Juego extends JFrame implements Runnable{
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+        setIcon();
         
         dbConnect = new DBConnect("jdbc:mysql://localhost:3306/PlantsVsZombies", "root", "");
         dbManager = new DBManager(dbConnect);
@@ -54,7 +56,7 @@ public class Juego extends JFrame implements Runnable{
 
         initClases();
         
-         
+        
         add(pantallaJuego);
         pack();
         
@@ -111,6 +113,11 @@ public class Juego extends JFrame implements Runnable{
                 lastTimeCheck = System.currentTimeMillis();
             }
         }
+    }
+    
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon("./src/main/resources/icon.png");
+        setIconImage(icon.getImage());
     }
     
     private void updateGame(){
