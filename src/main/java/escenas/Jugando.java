@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
@@ -40,6 +41,13 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private static final int CELL_HEIGHT = 60;
     private static final int GRID_COLS   = 9;
     private static final int GRID_ROWS   = 5;
+
+    // Tamaño de render de los sprites (75% de la celda)
+    private static final int SPRITE_W = Math.round(CELL_WIDTH  * 0.8f); // 29
+    private static final int SPRITE_H = Math.round(CELL_HEIGHT * 0.6f); // 45
+    // Offsets para centrar horizontalmente y alinear por la base
+    private static final int SPRITE_OFF_X = (CELL_WIDTH  - SPRITE_W) / 2;
+    private static final int SPRITE_OFF_Y =  CELL_HEIGHT - SPRITE_H - 8;
 
     public Jugando(Juego juego) {
         super(juego);
@@ -89,13 +97,17 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Dibuja jardin
         g.drawImage(tileManager.getSprite(0), 0, 0, null);
  
+        // Dibuja las plantas
         for (int row = 0; row < lvl.length; row++) {
             for (int col = 0; col < lvl[row].length; col++) {
                 int plantaId = lvl[row][col];
                 if (plantaId != 0) {
-                    java.awt.image.BufferedImage spr = tileManager.getSpriteByPlantaId(plantaId);
-                    int renderY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT - spr.getHeight();
-                    g.drawImage(spr, GRID_X + col * CELL_WIDTH, renderY, null);
+                    BufferedImage spr = tileManager.getSpriteByPlantaId(plantaId);
+                    g.drawImage(spr,
+                        GRID_X + col * CELL_WIDTH  + SPRITE_OFF_X,
+                        GRID_Y + row * CELL_HEIGHT + SPRITE_OFF_Y,
+                        SPRITE_W, SPRITE_H,
+                        null);
                 }
             }
         }
@@ -103,7 +115,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Ghost / drag preview: planta seleccionada siguiendo el cursor
         int plantaSeleccionadaId = hotbar.getSelectedPlantaId();
         if (plantaSeleccionadaId != 0) {
-            java.awt.image.BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(plantaSeleccionadaId);
+            BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(plantaSeleccionadaId);
             Graphics2D g2d = (Graphics2D) g;
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
 
@@ -112,18 +124,18 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             boolean overGrid = col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS;
 
             if (overGrid) {
-                // Snapeado a la celda más cercana
+                // Snapeado a la celda más cercana, alineado por la base
                 g2d.drawImage(ghostSpr,
-                    GRID_X + col * CELL_WIDTH,
-                    GRID_Y + row * CELL_HEIGHT,
-                    CELL_WIDTH, CELL_HEIGHT,
+                    GRID_X + col * CELL_WIDTH  + SPRITE_OFF_X,
+                    GRID_Y + row * CELL_HEIGHT + SPRITE_OFF_Y,
+                    SPRITE_W, SPRITE_H,
                     null);
             } else {
                 // Fuera del grid: sigue el cursor libremente (centrado en el puntero)
                 g2d.drawImage(ghostSpr,
-                    mouseX - CELL_WIDTH  / 2,
-                    mouseY - CELL_HEIGHT / 2,
-                    CELL_WIDTH, CELL_HEIGHT,
+                    mouseX - SPRITE_W / 2,
+                    mouseY - SPRITE_H / 2,
+                    SPRITE_W, SPRITE_H,
                     null);
             }
 
