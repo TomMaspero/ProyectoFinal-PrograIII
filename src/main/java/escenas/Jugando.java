@@ -5,8 +5,11 @@ import entidades.Planta;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
 import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
@@ -24,6 +27,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private Hotbar hotbar;
     private EnemyManager enemyManager;
     private int mouseX, mouseY;
+
+    // Debug grid overlay
+    private boolean showDebugGrid = false;
+    private static final Rectangle DEBUG_BTN = new Rectangle(565, 4, 70, 14);
 
     // Constantes del grid
     private static final int GRID_X      = 78;
@@ -124,8 +131,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         // Hotbar
         hotbar.draw(g);
-        
+
         enemyManager.draw(g);
+
+        // Debug overlay (siempre encima de todo)
+        if (showDebugGrid) drawDebugGrid(g);
+        drawDebugToggle(g);
     }
 
     public TileManager getTileManager() {
@@ -134,6 +145,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     @Override
     public void mouseClicked(int x, int y) {
+        if (DEBUG_BTN.contains(x, y)) {
+            showDebugGrid = !showDebugGrid;
+            return;
+        }
         if (y >= 360) {
             hotbar.mouseClicked(x, y);
         } else {
@@ -174,7 +189,58 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         hotbar.mouseReleased(x, y);
     }
 
-    
+    // ── Debug helpers ────────────────────────────────────────────────────────
 
-    
+    private void drawDebugToggle(Graphics g) {
+        g.setColor(showDebugGrid ? new Color(200, 0, 0) : new Color(60, 60, 60));
+        g.fillRect(DEBUG_BTN.x, DEBUG_BTN.y, DEBUG_BTN.width, DEBUG_BTN.height);
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.PLAIN, 9));
+        String label = showDebugGrid ? "Grid: ON" : "Grid: OFF";
+        int lw = g.getFontMetrics().stringWidth(label);
+        g.drawString(label, DEBUG_BTN.x + (DEBUG_BTN.width - lw) / 2,
+                            DEBUG_BTN.y + DEBUG_BTN.height - 3);
+    }
+
+    private void drawDebugGrid(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        Font labelFont = new Font("Arial", Font.BOLD, 7);
+        g2d.setFont(labelFont);
+
+        for (int row = 0; row < GRID_ROWS; row++) {
+            for (int col = 0; col < GRID_COLS; col++) {
+                int cx = GRID_X + col * CELL_WIDTH;
+                int cy = GRID_Y + row * CELL_HEIGHT;
+
+                // Semi-transparent red fill
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.18f));
+                g2d.setColor(Color.RED);
+                g2d.fillRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
+
+                // Solid red border
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+                g2d.setColor(Color.RED);
+                g2d.drawRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
+
+                // Label: (col,row) on top, lvl value below
+                g2d.setColor(Color.YELLOW);
+                String pos = col + "," + row;
+                int pw = g2d.getFontMetrics().stringWidth(pos);
+                g2d.drawString(pos, cx + (CELL_WIDTH - pw) / 2, cy + 8);
+
+                if (lvl != null && row < lvl.length && col < lvl[row].length) {
+                    String val = "id:" + lvl[row][col];
+                    int vw = g2d.getFontMetrics().stringWidth(val);
+                    g2d.setColor(Color.WHITE);
+                    g2d.drawString(val, cx + (CELL_WIDTH - vw) / 2, cy + CELL_HEIGHT - 2);
+                }
+            }
+        }
+
+        // Grid origin marker
+        g2d.setColor(Color.CYAN);
+        g2d.fillOval(GRID_X - 3, GRID_Y - 3, 6, 6);
+        g2d.setColor(Color.CYAN);
+        g2d.drawString("(" + GRID_X + "," + GRID_Y + ")", GRID_X + 5, GRID_Y - 2);
+    }
 }
