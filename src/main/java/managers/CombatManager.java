@@ -3,49 +3,47 @@ package managers;
 import entidades.Enemigo;
 import entidades.Proyectil;
 import escenas.Jugando;
-import helpers.CargaGuarda;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.List;
 
 public class CombatManager {
-    //private List<Proyectil> proyectiles = new ArrayList<>();
-    //private List<Enemigo> enemigos = new ArrayList<>();
-    
+
     private Jugando jugando;
-    private BufferedImage[] imgProyectiles;
     private ArrayList<Proyectil> proyectiles = new ArrayList<>();
-    
-    public CombatManager(Jugando jugando){
+    private BufferedImage peaSprite;
+    private BufferedImage peaSplatSprite;
+
+    public CombatManager(Jugando jugando) {
         this.jugando = jugando;
-        imgProyectiles = new BufferedImage[5]; // 5 Sprites max 
-        cargarImgProyectiles();
+        peaSprite = SpriteManager.getPeaSprite();
+        peaSplatSprite = SpriteManager.getPeaSplatSprite();
     }
-    
-    public void agregaProyectil(int x, int y){
-        proyectiles.add(new Proyectil(x, y)); 
-        // Reemplazar por coordenadas reales de pantalla.
-        // Se usa en Jugando -> mouseClicked para un test de spawneo                                        
+
+    public void spawn(float x, float y, int fila) {
+        proyectiles.add(new Proyectil(x, y, fila));
     }
-    
-    private void cargarImgProyectiles() {
-        BufferedImage atlas = CargaGuarda.getSpriteAtlas("peaAtlas.png");
-        imgProyectiles[0] = atlas.getSubimage(2,108,10,10); // reemplazar subimage por coord en atlas
+
+    public void update(ArrayList<Enemigo> enemigos) {
+        for (Proyectil p : proyectiles) {
+            p.update();
+            if (!p.isSplatting() && p.isActivo()) {
+                for (Enemigo e : enemigos) {
+                    if (e.getVida() > 0 && p.getColision().intersects(e.getColision())) {
+                        e.setVida(e.getVida() - p.getDanio());
+                        p.hit();
+                        break;
+                    }
+                }
+            }
+        }
+        proyectiles.removeIf(p -> !p.isActivo());
     }
-    
-    public void update(){
-        for(Proyectil p : proyectiles)
-            p.mover(2.0f, 0); // Mueve proyectiles hacia la derecha ->
+
+    public void draw(Graphics g) {
+        for (Proyectil p : proyectiles) {
+            BufferedImage sprite = p.isSplatting() ? peaSplatSprite : peaSprite;
+            g.drawImage(sprite, (int) p.getX(), (int) p.getY(), 16, 16, null);
+        }
     }
-    
-    public void draw(Graphics g){
-        for(Proyectil p : proyectiles)
-            dibujaProyectil(p,g);
-    }
-    
-    private void dibujaProyectil(Proyectil p, Graphics g){
-        g.drawImage(imgProyectiles[0],(int) p.getX(),(int) p.getY(), null);
-    }
-    
 }

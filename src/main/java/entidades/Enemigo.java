@@ -19,6 +19,7 @@ public class Enemigo extends Entidad {
         super(x, y, 32); // el ultimo se setea segun el tamanio del sprite
         this.ID = id;
         this.tipoEnemigo = tipoEnemigo;
+        this.vida = 100;
     }
     
     public int getVida() {

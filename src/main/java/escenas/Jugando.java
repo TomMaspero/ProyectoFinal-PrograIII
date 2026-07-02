@@ -1,6 +1,7 @@
 package escenas;
 
 import IU.Hotbar;
+import entidades.Enemigo;
 import entidades.Planta;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
