@@ -238,6 +238,22 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         
         combatManager.draw(g);
 
+        // Texto flotante de + 25
+        Font ftFont = new Font("Arial", Font.BOLD, 10);
+        g.setFont(ftFont);
+        for (FloatingText ft : floatingTexts) {
+            int elapsed = ft.totalTicks - ft.ticksLeft;
+            int drawY = ft.down ? ft.y + elapsed : ft.y - elapsed;
+            g.setColor(ft.color);
+            g.drawString(ft.text, ft.x, drawY);
+        }
+
+        // Contador de Sol
+        g.drawImage(solIcon, 555, 4, 20, 20, null);
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        g.drawString(String.valueOf(sol), 578, 18);
+
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
         drawDebugToggle(g);
