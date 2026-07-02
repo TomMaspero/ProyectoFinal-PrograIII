@@ -8,6 +8,7 @@ import IU.MyButton;
 import java.awt.Graphics;
 import static main.EstadoJuego.*;
 import main.Juego;
+import managers.TileManager;
 
 /**
  *
@@ -15,6 +16,8 @@ import main.Juego;
  */
 public class Menu extends EscenaJuego implements MetodosEscena{
     private MyButton bJugar,bAjustes,bSalir;
+    private final TileManager tileManager = new TileManager();
+    
     public Menu(Juego juego) {
         super(juego);
         initButtons();
@@ -26,6 +29,9 @@ public class Menu extends EscenaJuego implements MetodosEscena{
     
     @Override
     public void render(Graphics g) {
+        // dibuja el fondo
+        g.drawImage(tileManager.getSprite(1), 0, 0, null);
+        
         drawButtons(g);
     }
 

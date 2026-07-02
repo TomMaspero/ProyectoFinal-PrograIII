@@ -1,6 +1,7 @@
 package managers;
 
 import helpers.CargaGuarda;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import objetos.Tile;
@@ -29,11 +30,12 @@ public class TileManager {
     /**
      * Genera los tiles de fondo.
      *   tiles[0] = JARDIN
-     *   tiles[1] = PASTO
+     *   tiles[1] = Fondo Menu principal
      */
     private void createTiles() {
         int id = 0;
-        tiles.add(JARDIN = new Tile(getLargeSprite(0, 0, gardenAtlas),  id++, "Jardin")); // ID 0
+        tiles.add(JARDIN = new Tile(getLargeSprite(0, 0, gardenAtlas), id++, "Jardin")); // ID 0
+        tiles.add(new Tile(getLargeSprite(0, 0, CargaGuarda.getSpriteAtlas("menu.png")), id++, "Menu"));
     }
     /**
      * Retorna un sprite leido desde la lista segun su ID.
@@ -42,6 +44,10 @@ public class TileManager {
      */
     public BufferedImage getSprite(int id){
         return tiles.get(id).getSprite();
+    }
+    
+    public Image getIcon() {
+        return CargaGuarda.getIcon();
     }
 
     /**

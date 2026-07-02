@@ -6,8 +6,8 @@ import escenas.Menu;
 import javax.swing.JFrame;
 import Database.*;
 import dao.*;
-import javax.swing.ImageIcon;
 import managers.SpriteManager;
+import managers.TileManager;
 
 
 /**
@@ -116,8 +116,7 @@ public class Juego extends JFrame implements Runnable{
     }
     
     private void setIcon() {
-        ImageIcon icon = new ImageIcon("./src/main/resources/icon.png");
-        setIconImage(icon.getImage());
+        setIconImage(new TileManager().getIcon());
     }
     
     private void updateGame(){
