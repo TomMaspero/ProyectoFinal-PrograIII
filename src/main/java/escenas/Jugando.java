@@ -132,6 +132,15 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         enemyManager.removeDeadEnemies();
+        passiveSunTimer++;
+        if (passiveSunTimer >= PASSIVE_SUN_INTERVAL) {
+            passiveSunTimer = 0;
+            sol += 25;
+            floatingTexts.add(new FloatingText(555, 24, "+25", Color.YELLOW, 60, true));
+        }
+        floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
+    }
+
     private void updateSunGeneration() {
         for (int row = 0; row < GRID_ROWS; row++) {
             for (int col = 0; col < GRID_COLS; col++) {
