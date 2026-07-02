@@ -14,7 +14,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
+import managers.MusicManager;
 import managers.TileManager;
+import main.EstadoJuego;
 
 /**
  * Escena principal del juego.
@@ -164,6 +166,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
         if (y >= 360) {
             hotbar.mouseClicked(x, y);
+            if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
+                MusicManager.playMenuTheme();
         } else {
             // Intentar colocar planta en el grid
             int sel = hotbar.getSelectedPlantaId();

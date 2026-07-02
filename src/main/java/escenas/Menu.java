@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import static main.EstadoJuego.*;
 import main.Juego;
+import managers.MusicManager;
 
 /**
  *
@@ -26,6 +27,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
         super(juego);
         menuBg = CargaGuarda.getSpriteAtlas("menu.png");
         initButtons();
+        MusicManager.playMenuTheme();
     }
 
     private void initButtons() {
@@ -47,6 +49,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
     @Override
     public void mouseClicked(int x, int y) {
         if(bJugar.getBounds().contains(x,y)){
+            MusicManager.play("music/day_theme.mp3");
             SetEstadoJuego(JUGANDO);
         }
     }
