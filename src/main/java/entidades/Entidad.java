@@ -15,6 +15,8 @@ public abstract class Entidad {
     public void mover(float x, float y){
         this.x += x;
         this.y += y;
+        colision.x = (int) this.x;
+        colision.y = (int) this.y;
     }
     
     public float getX() {
