@@ -18,12 +18,14 @@ public class Hotbar {
     private MyButton bMenu;
     private ArrayList<MyButton> plantButtons = new ArrayList<>();
     private int selectedPlantaId = 0; // 0 = ninguna seleccionada
+    private List<Planta> plantas;
 
     public Hotbar(int x, int y, int width, int height, List<Planta> plantas, TileManager tileManager) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.plantas = plantas;
         initButtons(plantas, tileManager);
     }
 
