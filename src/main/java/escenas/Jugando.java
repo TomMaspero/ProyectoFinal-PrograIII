@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
@@ -36,6 +37,29 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     private int[][] fireTimers;
     private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
+
+    // Sol 
+    private int sol = 200;
+    private int[][] sunTimers;
+    private static final int SUN_INTERVAL = 480; // 480 / 60 UPS = 8.0s
+    private List<Planta> plantas;
+    private BufferedImage solIcon;
+    private ArrayList<FloatingText> floatingTexts = new ArrayList<>();
+
+    private int passiveSunTimer = 0;
+    private static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2;
+
+    private static class FloatingText {
+        int x, y, ticksLeft, totalTicks;
+        String text;
+        Color color;
+        boolean down;
+        FloatingText(int x, int y, String text, Color color, int ticks, boolean down) {
+            this.x = x; this.y = y; this.text = text;
+            this.color = color; this.ticksLeft = ticks;
+            this.totalTicks = ticks; this.down = down;
+        }
+    }
 
     // Debug grid overlay
     private boolean showDebugGrid = false;
@@ -64,12 +88,14 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         lvl = EditorNivel.getLevelData();
         tileManager = new TileManager();
 
-        List<Planta> plantas = juego.getPlantaDAO().findAll();
+        plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
-        
+
         enemyManager = new EnemyManager(this);
         combatManager = new CombatManager(this);
         fireTimers = new int[GRID_ROWS][GRID_COLS];
+        sunTimers = new int[GRID_ROWS][GRID_COLS];
+        solIcon = CargaGuarda.getSpriteAtlas("Sol.png");
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -102,9 +128,27 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     
     public void update(){
         updatePlantFiring();
+        updateSunGeneration();
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         enemyManager.removeDeadEnemies();
+    private void updateSunGeneration() {
+        for (int row = 0; row < GRID_ROWS; row++) {
+            for (int col = 0; col < GRID_COLS; col++) {
+                if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 2) {
+                    sunTimers[row][col]++;
+                    if (sunTimers[row][col] >= SUN_INTERVAL) {
+                        sunTimers[row][col] = 0;
+                        sol += 25;
+                        int tx = GRID_X + col * CELL_WIDTH;
+                        int ty = GRID_Y + row * CELL_HEIGHT;
+                        floatingTexts.add(new FloatingText(tx, ty, "+25", Color.YELLOW, 60, false));
+                    }
+                } else {
+                    sunTimers[row][col] = 0;
+                }
+            }
+        }
     }
 
     private boolean enemyInRow(int row) {
