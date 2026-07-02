@@ -43,6 +43,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private static final int CELL_HEIGHT = 60;
     private static final int GRID_COLS   = 9;
     private static final int GRID_ROWS   = 5;
+    private static final int GRID_RIGHT  = GRID_X + GRID_COLS * CELL_WIDTH;  // 454
+    private static final int GRID_BOTTOM = GRID_Y + GRID_ROWS * CELL_HEIGHT; // 342
 
     // Tamaño de render de los sprites (75% de la celda)
     private static final int SPRITE_W = Math.round(CELL_WIDTH  * 0.8f); // 29
@@ -196,7 +198,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                         && lvl[row][col] == 0) {
                     lvl[row][col] = sel;
                 }
-            } else {
+            } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
                 enemyManager.agregaEnemigo(x, y);
             }
         }
