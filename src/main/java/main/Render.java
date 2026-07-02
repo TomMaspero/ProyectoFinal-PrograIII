@@ -5,6 +5,8 @@
 package main;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 /**
  * Se encarga del renderizado principal del juego.
@@ -21,15 +23,18 @@ public class Render {
      * 
      */
     public void render(Graphics g){
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        g2d.scale(2.0, 2.0);
         switch(EstadoJuego.estadoJuego){
             case MENU:
-                juego.getMenu().render(g);
+                juego.getMenu().render(g2d);
                 break;
             case AJUSTES:
-                juego.getAjustes().render(g);
+                juego.getAjustes().render(g2d);
                 break;
             case JUGANDO:
-                juego.getJugando().render(g);
+                juego.getJugando().render(g2d);
                 break;
         }
     }
