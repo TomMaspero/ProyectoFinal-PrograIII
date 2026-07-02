@@ -39,7 +39,7 @@ public class EnemyManager {
     
     public void update(){
         for(Enemigo e : enemigos)
-            e.mover(0.5f, 0);
+            e.mover(-0.5f, 0);
     }
     
     public void draw(Graphics g){

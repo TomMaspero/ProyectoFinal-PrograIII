@@ -4,6 +4,7 @@
  */
 package helpers;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +14,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 /**
  * Maneja carga y guardado de recursos del juego.
@@ -34,6 +36,11 @@ public class CargaGuarda {
             e.printStackTrace();
         }
         return img;
+    }
+    
+    public static Image getIcon() {
+        ImageIcon icon = new ImageIcon("./src/main/resources/icon.png");
+        return icon.getImage();
     }
     
     public static void CreateFile(){

@@ -36,7 +36,7 @@ public class Pantalla extends JPanel {
     }
     
     private void setPanelSize(){
-        size = new Dimension(640,460);
+        size = new Dimension(1280,920);
         setMinimumSize(size);
         setPreferredSize(size);
         setMaximumSize(size);

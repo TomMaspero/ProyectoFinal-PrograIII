@@ -72,19 +72,7 @@ public class Hotbar {
         }
     }
 
-    public void mouseClicked(int x, int y) {
-        if (bMenu.getBounds().contains(x, y)) {
-            SetEstadoJuego(MENU);
-            return;
-        }
-        for (MyButton b : plantButtons) {
-            if (b.getBounds().contains(x, y)) {
-                // Toggle: clickear el mismo botón deselecciona
-                selectedPlantaId = (selectedPlantaId == b.getId()) ? 0 : b.getId();
-                return;
-            }
-        }
-    }
+    public void mouseClicked(int x, int y) { }
 
     public void mouseMoved(int x, int y) {
         bMenu.setMouseOver(false);
@@ -118,10 +106,16 @@ public class Hotbar {
     }
 
     public void mouseReleased(int x, int y) {
-        bMenu.resetBooleans();
+        if (bMenu.isMousePressed() && bMenu.getBounds().contains(x, y))
+            SetEstadoJuego(MENU);
+
         for (MyButton b : plantButtons) {
-            b.resetBooleans();
+            if (b.isMousePressed() && b.getBounds().contains(x, y))
+                selectedPlantaId = (selectedPlantaId == b.getId()) ? 0 : b.getId();
         }
+
+        bMenu.resetBooleans();
+        for (MyButton b : plantButtons) b.resetBooleans();
     }
 
     /** Devuelve el plantaId seleccionado actualmente (0 = ninguno). */

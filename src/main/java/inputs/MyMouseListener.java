@@ -28,63 +28,43 @@ public class MyMouseListener implements MouseListener,MouseMotionListener{
      */
     public void mouseClicked(MouseEvent me) {
         if(me.getButton() == MouseEvent.BUTTON1){
+            int x = me.getX() / 2, y = me.getY() / 2;
             switch(EstadoJuego.estadoJuego){
-                case MENU:
-                    juego.getMenu().mouseClicked(me.getX(),me.getY());
-                    break;
-                case JUGANDO:
-                    juego.getJugando().mouseClicked(me.getX(),me.getY());
-                    break;
-                case AJUSTES:
-                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
-                    break;
+                case MENU:    juego.getMenu().mouseClicked(x, y);    break;
+                case JUGANDO: juego.getJugando().mouseClicked(x, y); break;
+                case AJUSTES: juego.getAjustes().mouseClicked(x, y); break;
             }
         }
     }
-    
+
     @Override
     public void mouseMoved(MouseEvent me) {
+        int x = me.getX() / 2, y = me.getY() / 2;
         switch(EstadoJuego.estadoJuego){
-                case MENU:
-                    juego.getMenu().mouseMoved(me.getX(),me.getY());
-                    break;
-                case JUGANDO:
-                    juego.getJugando().mouseMoved(me.getX(),me.getY());
-                    break;
-                case AJUSTES:
-                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
-                    break;
-            }
+            case MENU:    juego.getMenu().mouseMoved(x, y);    break;
+            case JUGANDO: juego.getJugando().mouseMoved(x, y); break;
+            case AJUSTES: juego.getAjustes().mouseMoved(x, y); break;
+        }
     }
 
     @Override
     public void mousePressed(MouseEvent me) {
+        int x = me.getX() / 2, y = me.getY() / 2;
         switch(EstadoJuego.estadoJuego){
-                case MENU:
-                    juego.getMenu().mousePressed(me.getX(),me.getY());
-                    break;
-                case JUGANDO:
-                    juego.getJugando().mousePressed(me.getX(),me.getY());
-                    break;
-                case AJUSTES:
-                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
-                    break;
-            }
+            case MENU:    juego.getMenu().mousePressed(x, y);    break;
+            case JUGANDO: juego.getJugando().mousePressed(x, y); break;
+            case AJUSTES: juego.getAjustes().mousePressed(x, y); break;
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent me) {
+        int x = me.getX() / 2, y = me.getY() / 2;
         switch(EstadoJuego.estadoJuego){
-                case MENU:
-                    juego.getMenu().mouseReleased(me.getX(),me.getY());
-                    break;
-                case JUGANDO:
-                    juego.getJugando().mouseReleased(me.getX(), me.getY());
-                    break;
-                case AJUSTES:
-                    juego.getAjustes().mouseClicked(me.getX(),me.getY());
-                    break;
-            }
+            case MENU:    juego.getMenu().mouseReleased(x, y);    break;
+            case JUGANDO: juego.getJugando().mouseReleased(x, y); break;
+            case AJUSTES: juego.getAjustes().mouseReleased(x, y); break;
+        }
     }
 
     @Override

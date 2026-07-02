@@ -5,9 +5,12 @@
 package escenas;
 
 import IU.MyButton;
+import helpers.CargaGuarda;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import static main.EstadoJuego.*;
 import main.Juego;
+import managers.MusicManager;
 
 /**
  *
@@ -15,17 +18,27 @@ import main.Juego;
  */
 public class Menu extends EscenaJuego implements MetodosEscena{
     private MyButton bJugar,bAjustes,bSalir;
+    private final BufferedImage menuBg;
+
+    private static final int W = 640;
+    private static final int H = 460;
+
     public Menu(Juego juego) {
         super(juego);
+        menuBg = CargaGuarda.getSpriteAtlas("menu.png");
         initButtons();
+        MusicManager.playMenuTheme();
     }
 
     private void initButtons() {
         bJugar = new MyButton("Jugar",100,100,100,30);
     }
-    
+
     @Override
     public void render(Graphics g) {
+        // dibuja el fondo
+        g.drawImage(menuBg, 0, 0, W, H, null);
+
         drawButtons(g);
     }
 
@@ -34,11 +47,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
     }
 
     @Override
-    public void mouseClicked(int x, int y) {
-        if(bJugar.getBounds().contains(x,y)){
-            SetEstadoJuego(JUGANDO);
-        }
-    }
+    public void mouseClicked(int x, int y) { }
 
     @Override
     public void mouseMoved(int x, int y) {
@@ -57,11 +66,11 @@ public class Menu extends EscenaJuego implements MetodosEscena{
 
     @Override
     public void mouseReleased(int x, int y) {
-        resetButtons();
-    }
-
-    private void resetButtons() {
-        bJugar.resetBooleans();    
+        if (bJugar.isMousePressed() && bJugar.getBounds().contains(x, y)) {
+            MusicManager.play("music/day_theme.mp3");
+            SetEstadoJuego(JUGANDO);
+        }
+        bJugar.resetBooleans();
     }
     
 }

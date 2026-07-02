@@ -14,7 +14,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
+import managers.MusicManager;
 import managers.TileManager;
+import main.EstadoJuego;
 
 /**
  * Escena principal del juego.
@@ -41,6 +43,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private static final int CELL_HEIGHT = 60;
     private static final int GRID_COLS   = 9;
     private static final int GRID_ROWS   = 5;
+    private static final int GRID_RIGHT  = GRID_X + GRID_COLS * CELL_WIDTH;  // 454
+    private static final int GRID_BOTTOM = GRID_Y + GRID_ROWS * CELL_HEIGHT; // 342
 
     // Tamaño de render de los sprites (75% de la celda)
     private static final int SPRITE_W = Math.round(CELL_WIDTH  * 0.8f); // 29
@@ -157,29 +161,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     }
 
     @Override
-    public void mouseClicked(int x, int y) {
-        if (DEBUG_BTN.contains(x, y)) {
-            showDebugGrid = !showDebugGrid;
-            return;
-        }
-        if (y >= 360) {
-            hotbar.mouseClicked(x, y);
-        } else {
-            // Intentar colocar planta en el grid
-            int sel = hotbar.getSelectedPlantaId();
-            if (sel != 0) {
-                int col = (x - GRID_X) / CELL_WIDTH;
-                int row = (y - GRID_Y) / CELL_HEIGHT;
-                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
-                        && lvl[row][col] == 0) {
-                    lvl[row][col] = sel;
-                }
-            }else{
-            // TEST DE AGREGAR ENEMIGO
-                enemyManager.agregaEnemigo(x,y);
-            }
-        }
-    }
+    public void mouseClicked(int x, int y) { }
 
     @Override
     public void mouseMoved(int x, int y) {
@@ -199,7 +181,27 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     @Override
     public void mouseReleased(int x, int y) {
-        hotbar.mouseReleased(x, y);
+        if (DEBUG_BTN.contains(x, y)) {
+            showDebugGrid = !showDebugGrid;
+            return;
+        }
+        if (y >= 360) {
+            hotbar.mouseReleased(x, y);
+            if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
+                MusicManager.playMenuTheme();
+        } else {
+            int sel = hotbar.getSelectedPlantaId();
+            if (sel != 0) {
+                int col = (x - GRID_X) / CELL_WIDTH;
+                int row = (y - GRID_Y) / CELL_HEIGHT;
+                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
+                        && lvl[row][col] == 0) {
+                    lvl[row][col] = sel;
+                }
+            } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
+                enemyManager.agregaEnemigo(x, y);
+            }
+        }
     }
 
     // ── Debug helpers ────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import Database.*;
 import dao.*;
 import managers.SpriteManager;
+import managers.TileManager;
 
 
 /**
@@ -38,8 +39,8 @@ public class Juego extends JFrame implements Runnable{
     
     public Juego(){ 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setResizable(false);
+        setIcon();
         
         dbConnect = new DBConnect("jdbc:mysql://localhost:3306/PlantsVsZombies", "root", "");
         dbManager = new DBManager(dbConnect);
@@ -54,10 +55,10 @@ public class Juego extends JFrame implements Runnable{
 
         initClases();
         
-         
+        
         add(pantallaJuego);
         pack();
-        
+        setLocationRelativeTo(null);
         setVisible(true);
     }
     
@@ -111,6 +112,10 @@ public class Juego extends JFrame implements Runnable{
                 lastTimeCheck = System.currentTimeMillis();
             }
         }
+    }
+    
+    private void setIcon() {
+        setIconImage(new TileManager().getIcon());
     }
     
     private void updateGame(){
