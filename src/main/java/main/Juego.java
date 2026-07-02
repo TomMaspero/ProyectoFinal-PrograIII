@@ -39,7 +39,6 @@ public class Juego extends JFrame implements Runnable{
     
     public Juego(){ 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
         setResizable(false);
         setIcon();
         
@@ -59,7 +58,7 @@ public class Juego extends JFrame implements Runnable{
         
         add(pantallaJuego);
         pack();
-        
+        setLocationRelativeTo(null);
         setVisible(true);
     }
     
