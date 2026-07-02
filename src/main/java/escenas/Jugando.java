@@ -63,7 +63,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     // Debug grid overlay
     private boolean showDebugGrid = false;
-    private static final Rectangle DEBUG_BTN = new Rectangle(565, 4, 70, 14);
+    private static final Rectangle DEBUG_BTN = new Rectangle(565, 344, 70, 14);
 
     // Constantes del grid — calibradas sobre yard_resize.png (640×360)
     // Área de pasto: x=112–454 (9×38px), y=42–342 (5×60px)
