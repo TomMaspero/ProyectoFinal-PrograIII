@@ -5,14 +5,14 @@ public class Proyectil extends Entidad {
     private float velocidad = 2.0f;
     
     public Proyectil(float x, float y) {
-        super(x, y, 15); // chequear tamanio sprite
+        super(x, y, 10); // chequear tamanio sprite
     }
     
-    public void update() {
+    /*public void update() {
         if (getX() < 640) { // limite pantalla (chequear numero)
             mover(velocidad, 0);
         }
-    }
+    }*/
 
     public int getDanio() {
         return danio;

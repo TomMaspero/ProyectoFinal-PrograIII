@@ -17,6 +17,7 @@ import managers.EnemyManager;
 import managers.MusicManager;
 import managers.TileManager;
 import main.EstadoJuego;
+import managers.CombatManager;
 
 /**
  * Escena principal del juego.
@@ -29,6 +30,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private TileManager tileManager;
     private Hotbar hotbar;
     private EnemyManager enemyManager;
+    private CombatManager combatManager;
     private int mouseX, mouseY;
 
     // Debug grid overlay
@@ -62,6 +64,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
         
         enemyManager = new EnemyManager(this);
+        
+        combatManager = new CombatManager(this);
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -93,7 +97,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     */
     
     public void update(){
-        enemyManager.update();
+        enemyManager.update(); // Actualizacion de enemigos
+        combatManager.update();
     }
 
     @Override
@@ -150,6 +155,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         hotbar.draw(g);
 
         enemyManager.draw(g);
+        
+        combatManager.draw(g);
 
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
@@ -190,17 +197,19 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
                 MusicManager.playMenuTheme();
         } else {
-            int sel = hotbar.getSelectedPlantaId();
+            int sel = hotbar.getSelectedPlantaId(); // Obtiene id de la planta desde el boton de la hotbar
             if (sel != 0) {
                 int col = (x - GRID_X) / CELL_WIDTH;
                 int row = (y - GRID_Y) / CELL_HEIGHT;
                 if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
                         && lvl[row][col] == 0) {
-                    lvl[row][col] = sel;
+                    lvl[row][col] = sel; // Setea la coordenada del array para ubicar la planta en el nivel
+                    combatManager.agregaProyectil(x, y); // test
                 }
             } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
-                enemyManager.agregaEnemigo(x, y);
-            }
+                enemyManager.agregaEnemigo(x, y);   
+            } 
+            // Combat manager agrega proyectil en x y 
         }
     }
 
