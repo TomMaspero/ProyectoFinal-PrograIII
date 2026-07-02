@@ -34,6 +34,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private CombatManager combatManager;
     private int mouseX, mouseY;
 
+    private int[][] fireTimers;
+    private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
+
     // Debug grid overlay
     private boolean showDebugGrid = false;
     private static final Rectangle DEBUG_BTN = new Rectangle(565, 4, 70, 14);
@@ -65,8 +68,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
         
         enemyManager = new EnemyManager(this);
-        
         combatManager = new CombatManager(this);
+        fireTimers = new int[GRID_ROWS][GRID_COLS];
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -98,8 +101,40 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     */
     
     public void update(){
-        enemyManager.update(); // Actualizacion de enemigos
-        combatManager.update();
+        updatePlantFiring();
+        combatManager.update(enemyManager.getEnemigos());
+        enemyManager.update();
+        enemyManager.removeDeadEnemies();
+    }
+
+    private boolean enemyInRow(int row) {
+        int rowTop = GRID_Y + row * CELL_HEIGHT;
+        int rowBottom = rowTop + CELL_HEIGHT;
+        for (Enemigo e : enemyManager.getEnemigos()) {
+            float cy = e.getY() + e.getColision().height / 2f;
+            if (cy >= rowTop && cy < rowBottom)
+                return true;
+        }
+        return false;
+    }
+
+    private void updatePlantFiring() {
+        for (int row = 0; row < GRID_ROWS; row++) {
+            boolean hasEnemy = enemyInRow(row);
+            for (int col = 0; col < GRID_COLS; col++) {
+                if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 1 && hasEnemy) {
+                    fireTimers[row][col]++;
+                    if (fireTimers[row][col] >= FIRE_INTERVAL) {
+                        fireTimers[row][col] = 0;
+                        float spawnX = GRID_X + col * CELL_WIDTH + CELL_WIDTH;
+                        float spawnY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT / 2 - 8;
+                        combatManager.spawn(spawnX, spawnY, row);
+                    }
+                } else {
+                    fireTimers[row][col] = 0;
+                }
+            }
+        }
     }
 
     @Override
@@ -204,8 +239,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                 int row = (y - GRID_Y) / CELL_HEIGHT;
                 if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
                         && lvl[row][col] == 0) {
-                    lvl[row][col] = sel; // Setea la coordenada del array para ubicar la planta en el nivel
-                    combatManager.agregaProyectil(x, y); // test
+                    lvl[row][col] = sel;
                 }
             } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
                 enemyManager.agregaEnemigo(x, y);   
