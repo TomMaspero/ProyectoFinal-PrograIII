@@ -243,6 +243,13 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         drawDebugToggle(g);
     }
 
+    private int getCostoPlanta(int plantaId) {
+        for (Planta p : plantas) {
+            if (p.getPlantaId() == plantaId) return p.getCostoSol();
+        }
+        return 0;
+    }
+
     public TileManager getTileManager() {
         return tileManager;
     }
@@ -277,13 +284,22 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
                 MusicManager.playMenuTheme();
         } else {
-            int sel = hotbar.getSelectedPlantaId(); // Obtiene id de la planta desde el boton de la hotbar
+            int sel = hotbar.getSelectedPlantaId();
             if (sel != 0) {
                 int col = (x - GRID_X) / CELL_WIDTH;
                 int row = (y - GRID_Y) / CELL_HEIGHT;
                 if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
                         && lvl[row][col] == 0) {
-                    lvl[row][col] = sel;
+                    int costo = getCostoPlanta(sel);
+                    if (sol >= costo) {
+                        lvl[row][col] = sel;
+                        sol -= costo;
+                    } else {
+                        boolean yaHayError = floatingTexts.stream()
+                                .anyMatch(ft -> ft.color == Color.RED);
+                        if (!yaHayError)
+                            floatingTexts.add(new FloatingText(x - 40, y, "No hay suficiente Sol!", Color.RED, 90, false));
+                    }
                 }
             } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
                 enemyManager.agregaEnemigo(x, y);   
