@@ -5,10 +5,11 @@
 package escenas;
 
 import IU.MyButton;
+import helpers.CargaGuarda;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import static main.EstadoJuego.*;
 import main.Juego;
-import managers.TileManager;
 
 /**
  *
@@ -16,22 +17,26 @@ import managers.TileManager;
  */
 public class Menu extends EscenaJuego implements MetodosEscena{
     private MyButton bJugar,bAjustes,bSalir;
-    private final TileManager tileManager = new TileManager();
-    
+    private final BufferedImage menuBg;
+
+    private static final int W = 640;
+    private static final int H = 460;
+
     public Menu(Juego juego) {
         super(juego);
+        menuBg = CargaGuarda.getSpriteAtlas("menu.png");
         initButtons();
     }
 
     private void initButtons() {
         bJugar = new MyButton("Jugar",100,100,100,30);
     }
-    
+
     @Override
     public void render(Graphics g) {
         // dibuja el fondo
-        g.drawImage(tileManager.getSprite(1), 0, 0, null);
-        
+        g.drawImage(menuBg, 0, 0, W, H, null);
+
         drawButtons(g);
     }
 
