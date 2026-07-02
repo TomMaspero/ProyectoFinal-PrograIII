@@ -6,7 +6,7 @@ package managers;
 
 import helpers.CargaGuarda;
 import escenas.Jugando;
-import enemigos.Enemigo;
+import entidades.Enemigo;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
