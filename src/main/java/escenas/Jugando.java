@@ -159,31 +159,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     }
 
     @Override
-    public void mouseClicked(int x, int y) {
-        if (DEBUG_BTN.contains(x, y)) {
-            showDebugGrid = !showDebugGrid;
-            return;
-        }
-        if (y >= 360) {
-            hotbar.mouseClicked(x, y);
-            if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
-                MusicManager.playMenuTheme();
-        } else {
-            // Intentar colocar planta en el grid
-            int sel = hotbar.getSelectedPlantaId();
-            if (sel != 0) {
-                int col = (x - GRID_X) / CELL_WIDTH;
-                int row = (y - GRID_Y) / CELL_HEIGHT;
-                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
-                        && lvl[row][col] == 0) {
-                    lvl[row][col] = sel;
-                }
-            }else{
-            // TEST DE AGREGAR ENEMIGO
-                enemyManager.agregaEnemigo(x,y);
-            }
-        }
-    }
+    public void mouseClicked(int x, int y) { }
 
     @Override
     public void mouseMoved(int x, int y) {
@@ -203,7 +179,27 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     @Override
     public void mouseReleased(int x, int y) {
-        hotbar.mouseReleased(x, y);
+        if (DEBUG_BTN.contains(x, y)) {
+            showDebugGrid = !showDebugGrid;
+            return;
+        }
+        if (y >= 360) {
+            hotbar.mouseReleased(x, y);
+            if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
+                MusicManager.playMenuTheme();
+        } else {
+            int sel = hotbar.getSelectedPlantaId();
+            if (sel != 0) {
+                int col = (x - GRID_X) / CELL_WIDTH;
+                int row = (y - GRID_Y) / CELL_HEIGHT;
+                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
+                        && lvl[row][col] == 0) {
+                    lvl[row][col] = sel;
+                }
+            } else {
+                enemyManager.agregaEnemigo(x, y);
+            }
+        }
     }
 
     // ── Debug helpers ────────────────────────────────────────────────────────

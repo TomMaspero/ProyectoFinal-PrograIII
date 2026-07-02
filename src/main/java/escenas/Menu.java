@@ -47,12 +47,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
     }
 
     @Override
-    public void mouseClicked(int x, int y) {
-        if(bJugar.getBounds().contains(x,y)){
-            MusicManager.play("music/day_theme.mp3");
-            SetEstadoJuego(JUGANDO);
-        }
-    }
+    public void mouseClicked(int x, int y) { }
 
     @Override
     public void mouseMoved(int x, int y) {
@@ -71,11 +66,11 @@ public class Menu extends EscenaJuego implements MetodosEscena{
 
     @Override
     public void mouseReleased(int x, int y) {
-        resetButtons();
-    }
-
-    private void resetButtons() {
-        bJugar.resetBooleans();    
+        if (bJugar.isMousePressed() && bJugar.getBounds().contains(x, y)) {
+            MusicManager.play("music/day_theme.mp3");
+            SetEstadoJuego(JUGANDO);
+        }
+        bJugar.resetBooleans();
     }
     
 }
