@@ -31,7 +31,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
     }
 
     private void initButtons() {
-        bJugar = new MyButton("Jugar",100,100,100,30);
+        bJugar = new MyButton("Jugar",280,200,100,30);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package IU;
 
 import entidades.Planta;
+import helpers.CargaGuarda;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import managers.TileManager;
@@ -23,6 +25,7 @@ public class Hotbar {
     private ArrayList<MyButton> plantButtons = new ArrayList<>();
     private int selectedPlantaId = 0; // 0 = ninguna seleccionada
     private List<Planta> plantas;
+    private BufferedImage fondoHotbar;
 
     public Hotbar(int x, int y, int width, int height, List<Planta> plantas, TileManager tileManager) {
         this.x = x;
@@ -58,8 +61,12 @@ public class Hotbar {
 
     public void draw(Graphics g) {
         // Fondo
+        fondoHotbar = CargaGuarda.getSpriteAtlas("fondo.png");
+        
+        g.drawImage(fondoHotbar,0,360,null);
+        
         g.setColor(Color.ORANGE);
-        g.fillRect(x, y, width, height);
+        //g.fillRect(x, y, width, height);
 
         // Resaltar botón seleccionado
         if (selectedPlantaId != 0) {
