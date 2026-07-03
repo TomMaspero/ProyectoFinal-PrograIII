@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import main.EstadoJuego;
 
+import main.Juego;
 import static main.EstadoJuego.*;
 
 
@@ -17,6 +18,11 @@ import static main.EstadoJuego.*;
  * @author lucio
  */
 public class KeyboardListener implements KeyListener{
+    private Juego juego;
+
+    public KeyboardListener(Juego juego) {
+        this.juego = juego;
+    }
 
     @Override
     public void keyTyped(KeyEvent ke) {
@@ -37,6 +43,7 @@ public class KeyboardListener implements KeyListener{
         }
         
         if(ke.getKeyCode() == KeyEvent.VK_D){
+            juego.resetJugando();
             EstadoJuego.estadoJuego = JUGANDO;
             System.out.println("[D]Jugar...");
         }

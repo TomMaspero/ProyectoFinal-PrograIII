@@ -68,6 +68,7 @@ public class Menu extends EscenaJuego implements MetodosEscena{
     public void mouseReleased(int x, int y) {
         if (bJugar.isMousePressed() && bJugar.getBounds().contains(x, y)) {
             MusicManager.play("music/day_theme.mp3");
+            getJuego().resetJugando();
             SetEstadoJuego(JUGANDO);
         }
         bJugar.resetBooleans();

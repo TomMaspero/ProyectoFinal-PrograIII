@@ -44,7 +44,7 @@ public class Pantalla extends JPanel {
     
     public void initInputs(){
         myMouseListener = new MyMouseListener(juego);
-        myKeyboardListener = new KeyboardListener();
+        myKeyboardListener = new KeyboardListener(juego);
         
         addMouseListener(myMouseListener);
         addMouseMotionListener(myMouseListener);
