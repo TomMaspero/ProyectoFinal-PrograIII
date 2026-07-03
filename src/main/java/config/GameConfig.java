@@ -9,19 +9,19 @@ package config;
 public class GameConfig {
 
     // Oleadas (WaveManager) 
-    public static final int WAVE_BASE_INTERVAL = 360;     // ticks entre spawns (6s a 60 UPS)
+    public static final int WAVE_BASE_INTERVAL = 600;     // ticks entre spawns (10s a 60 UPS)
     public static final int WAVE_RANDOM_OFFSET_MAX = 180; // variacion aleatoria extra (0-3s)
     public static final int[] WAVE_UMBRALES_PUNTOS = {0, 30, 80, 200, 500};
     public static final int[] WAVE_INTERVALOS_BASE = {300, 240, 180, 120, 90};
 
     // Combate 
-    public static final float PROYECTIL_VELOCIDAD = 1.5f;
+    public static final float PROYECTIL_VELOCIDAD = 1.75f;
     public static final int PROYECTIL_DANIO = 20;
     public static final float ZOMBIE_VELOCIDAD = -0.25f;
 
     // ── Plantas
     public static final int FIRE_INTERVAL = 96;    // ticks entre disparos de un peashooter (1.6s)
-    public static final int SUN_INTERVAL = 600;    // ticks entre generacion de sol de un girasol (10s)
+    public static final int SUN_INTERVAL = 480;    // ticks entre generacion de sol de un girasol (8s)
     public static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2; // generacion pasiva de sol
     public static final int SOL_INICIAL = 100;
     public static final int SOL_POR_GENERACION = 25;

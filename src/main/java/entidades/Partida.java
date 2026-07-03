@@ -8,6 +8,7 @@ public class Partida {
     private int oleadasSuperadas;
     private int zombiesEliminados;
     private int plantasPerdidas;
+    private int puntuacion;
     private LocalDateTime fecha;
 
     public Partida() {}
@@ -30,6 +31,9 @@ public class Partida {
 
     public int getPlantasPerdidas() { return plantasPerdidas; }
     public void setPlantasPerdidas(int plantasPerdidas) { this.plantasPerdidas = plantasPerdidas; }
+
+    public int getPuntuacion() { return puntuacion; }
+    public void setPuntuacion(int puntuacion) { this.puntuacion = puntuacion; }
 
     public LocalDateTime getFecha() { return fecha; }
     public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }

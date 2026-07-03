@@ -26,7 +26,7 @@ CREATE TABLE jugadores (
 ```
 
 ### `partidas`
-Registra el historial de partidas jugadas.
+Registra el historial de partidas jugadas, incluyendo el puntaje obtenido.
 
 ```sql
 CREATE TABLE partidas (
@@ -35,39 +35,14 @@ CREATE TABLE partidas (
     oleadas_superadas  INT DEFAULT 0,
     zombies_eliminados INT DEFAULT 0,
     plantas_perdidas   INT DEFAULT 0,
+    puntuacion         INT NOT NULL DEFAULT 0,
     fecha              DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (jugadorId) REFERENCES jugadores(jugadorId)
 );
 ```
 
-### `puntajes`
-Tabla de puntuaciones / leaderboard.
-
-```sql
-CREATE TABLE puntajes (
-    puntajeId  INT AUTO_INCREMENT PRIMARY KEY,
-    jugadorId  INT NOT NULL,
-    puntuacion INT NOT NULL,
-    fecha      DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (jugadorId) REFERENCES jugadores(jugadorId)
-);
-```
-
-### `configuracion`
-Preferencias de cada jugador (una fila por jugador).
-
-```sql
-CREATE TABLE configuracion (
-    jugadorId       INT PRIMARY KEY,
-    volumen         INT DEFAULT 50,
-    dificultad      VARCHAR(20) DEFAULT 'NORMAL',
-    pantalla_completa BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (jugadorId) REFERENCES jugadores(jugadorId)
-);
-```
-
 ### `plantas`
-Catálogo de plantas disponibles en el juego. Tiene dos filas sembradas por defecto.
+Representa el catálogo de plantas disponibles en el juego. Tiene dos filas sembradas por defecto y la pala
 
 ```sql
 CREATE TABLE plantas (
@@ -125,7 +100,7 @@ int id = dbManager.runInsert(
 
 // UPDATE
 int afectadas = dbManager.runUpdate(
-    "UPDATE configuracion SET volumen = ? WHERE jugadorId = ?", 80, 1);
+    "UPDATE jugadores SET nombre = ? WHERE jugadorId = ?", "Tom", 1);
 ```
 
 ---
@@ -151,29 +126,10 @@ Constructor conveniente: `new Jugador("NombreJugador")`
 | `oleadasSuperadas` | `int` | `oleadas_superadas` |
 | `zombiesEliminados` | `int` | `zombies_eliminados` |
 | `plantasPerdidas` | `int` | `plantas_perdidas` |
-| `fecha` | `LocalDateTime` | `fecha` |
-
-Constructor conveniente: `new Partida(jugadorId)`
-
-### `Puntaje`
-| Campo | Tipo | Columna |
-|---|---|---|
-| `puntajeId` | `int` | `puntajeId` (PK) |
-| `jugadorId` | `int` | `jugadorId` (FK) |
 | `puntuacion` | `int` | `puntuacion` |
 | `fecha` | `LocalDateTime` | `fecha` |
 
-Constructor conveniente: `new Puntaje(jugadorId, puntuacion)`
-
-### `Configuracion`
-| Campo | Tipo | Columna |
-|---|---|---|
-| `jugadorId` | `int` | `jugadorId` (PK/FK) |
-| `volumen` | `int` | `volumen` |
-| `dificultad` | `String` | `dificultad` |
-| `pantallaCompleta` | `boolean` | `pantalla_completa` |
-
-Constructor conveniente: `new Configuracion(jugadorId)` — inicializa con valores por defecto (volumen 50, dificultad NORMAL).
+Constructor conveniente: `new Partida(jugadorId)`
 
 ### `Planta`
 | Campo | Tipo | Columna |
@@ -194,15 +150,13 @@ Cada DAO recibe un `DBManager` en su constructor y es instanciado una sola vez e
 // En Juego.java
 jugadorDAO        = new JugadorDAO(dbManager);
 partidaDAO        = new PartidaDAO(dbManager);
-puntajeDAO        = new PuntajeDAO(dbManager);
-configuracionDAO  = new ConfiguracionDAO(dbManager);
 plantaDAO         = new PlantaDAO(dbManager);
 ```
 
 Acceso desde otras escenas vía getters de `Juego`:
 ```java
 juego.getJugadorDAO().findByNombre("Tom");
-juego.getPuntajeDAO().getTopN(10);
+juego.getPartidaDAO().findHighscores();
 ```
 
 ### `JugadorDAO`
@@ -215,22 +169,9 @@ juego.getPuntajeDAO().getTopN(10);
 ### `PartidaDAO`
 | Método | Descripción |
 |---|---|
-| `save(Partida)` | Guarda una partida finalizada. Setea `partidaId` en el objeto. |
+| `save(Partida)` | Guarda una partida finalizada (incluye `puntuacion`). Setea `partidaId` en el objeto. |
 | `findByJugador(int jugadorId)` | Devuelve todas las partidas del jugador, ordenadas de más reciente a más antigua. |
-
-### `PuntajeDAO`
-| Método | Descripción |
-|---|---|
-| `save(Puntaje)` | Guarda una entrada de puntaje. Setea `puntajeId` en el objeto. |
-| `getTopN(int n)` | Devuelve los `n` mejores puntajes globales (incluye `nombre` del jugador via JOIN). |
-| `findByJugador(int jugadorId)` | Devuelve todos los puntajes de un jugador, ordenados de más reciente a más antiguo. |
-
-### `ConfiguracionDAO`
-| Método | Descripción |
-|---|---|
-| `save(Configuracion)` | Inserta la fila de configuración inicial para un jugador nuevo. |
-| `findByJugador(int jugadorId)` | Devuelve la configuración del jugador. Si no existe, devuelve una `Configuracion` con valores por defecto. |
-| `update(Configuracion)` | Actualiza los tres campos editables (`volumen`, `dificultad`, `pantalla_completa`). |
+| `findHighscores()` | Devuelve `nombre`, suma de `zombies_eliminados` y suma de `puntuacion` agrupados por jugador, ordenados de mayor a menor puntaje. Usado por la pantalla de Highscores del menú. |
 
 ### `PlantaDAO`
 | Método | Descripción |

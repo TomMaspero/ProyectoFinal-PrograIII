@@ -15,19 +15,20 @@ public class PartidaDAO {
     }
     
     public int save(Partida partida) {
-        String sql = "INSERT INTO partidas (jugadorId, oleadas_superadas, zombies_eliminados, plantas_perdidas) "
-                   + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO partidas (jugadorId, oleadas_superadas, zombies_eliminados, plantas_perdidas, puntuacion) "
+                   + "VALUES (?, ?, ?, ?, ?)";
         int generatedId = dbManager.runInsert(sql,
                 partida.getJugadorId(),
                 partida.getOleadasSuperadas(),
                 partida.getZombiesEliminados(),
-                partida.getPlantasPerdidas());
+                partida.getPlantasPerdidas(),
+                partida.getPuntuacion());
         if (generatedId != -1) {
             partida.setPartidaId(generatedId);
         }
         return generatedId;
     }
-    
+
     public List<Partida> findByJugador(int jugadorId) {
         String sql = "SELECT * FROM partidas WHERE jugadorId = ? ORDER BY fecha DESC";
         List<Map<String, Object>> rows = dbManager.runSelect(sql, jugadorId);
@@ -36,6 +37,18 @@ public class PartidaDAO {
             partidas.add(mapRow(row));
         }
         return partidas;
+    }
+
+    /** Puntajes totales por jugador, para la pantalla de Highscores. */
+    public List<Map<String, Object>> findHighscores() {
+        String sql = "SELECT j.nombre AS nombre, "
+                   + "SUM(p.zombies_eliminados) AS zombies_eliminados, "
+                   + "SUM(p.puntuacion) AS puntuacion "
+                   + "FROM partidas p "
+                   + "JOIN jugadores j ON p.jugadorId = j.jugadorId "
+                   + "GROUP BY j.jugadorId, j.nombre "
+                   + "ORDER BY puntuacion DESC";
+        return dbManager.runSelect(sql);
     }
 
     private static LocalDateTime toLocalDateTime(Object value) {
@@ -51,6 +64,7 @@ public class PartidaDAO {
         p.setOleadasSuperadas(((Number) row.get("oleadas_superadas")).intValue());
         p.setZombiesEliminados(((Number) row.get("zombies_eliminados")).intValue());
         p.setPlantasPerdidas(((Number) row.get("plantas_perdidas")).intValue());
+        p.setPuntuacion(((Number) row.get("puntuacion")).intValue());
         p.setFecha(toLocalDateTime(row.get("fecha")));
         return p;
     }
