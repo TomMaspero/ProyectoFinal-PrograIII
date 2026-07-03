@@ -442,6 +442,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                         int costo = getCostoPlanta(sel);
                         if (sol >= costo) {
                             lvl[row][col] = sel;
+                            MusicManager.playSFX("music/tierra.mp3");
                             sol -= costo;
                         } else {
                             boolean yaHayError = floatingTexts.stream()
