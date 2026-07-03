@@ -75,13 +75,13 @@ CREATE TABLE plantas (
     nombre          VARCHAR(50) NOT NULL,
     costo_sol       INT NOT NULL,
     dano            INT DEFAULT 0,
-    velocidad_ataque DECIMAL(4,2) DEFAULT 0.0,
     ruta_sprite     VARCHAR(100)
 );
 
-INSERT INTO plantas (nombre, costo_sol, dano, velocidad_ataque, ruta_sprite)
-VALUES ('Peashooter', 100, 20, 1.5, 'peaAtlas.png'),
-       ('Sunflower',  50,  0, 0.0, 'sunflower.png');
+INSERT INTO plantas (nombre, costo_sol, dano, ruta_sprite)
+VALUES ('Peashooter', 100, 20, 'peaAtlas.png'),
+       ('Sunflower',  50,  0, 'sunflower.png'),
+       ('Pala',       0,   0, 'pala.png');
 ```
 
 ---
@@ -182,7 +182,6 @@ Constructor conveniente: `new Configuracion(jugadorId)` — inicializa con valor
 | `nombre` | `String` | `nombre` |
 | `costoSol` | `int` | `costo_sol` |
 | `dano` | `int` | `dano` |
-| `velocidadAtaque` | `BigDecimal` | `velocidad_ataque` |
 | `rutaSprite` | `String` | `ruta_sprite` |
 
 ---

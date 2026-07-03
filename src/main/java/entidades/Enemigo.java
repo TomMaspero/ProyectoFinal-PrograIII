@@ -12,14 +12,14 @@ import java.awt.Rectangle;
  */
 public class Enemigo extends Entidad {
     private int vida;
-    private int ID;
-    private int tipoEnemigo;
+    private int enemigoId;
+    private int puntaje;
     
-    public Enemigo(float x, float y, int id, int tipoEnemigo){
+    public Enemigo(float x, float y, TipoEnemigo tipoEnemigo){
         super(x, y, 32); // el ultimo se setea segun el tamanio del sprite
-        this.ID = id;
-        this.tipoEnemigo = tipoEnemigo;
-        this.vida = 100;
+        this.enemigoId = tipoEnemigo.getEnemigoId();
+        this.vida = tipoEnemigo.getVida();
+        this.puntaje = tipoEnemigo.getPuntaje();
     }
     
     public int getVida() {
@@ -30,19 +30,11 @@ public class Enemigo extends Entidad {
         this.vida = vida;
     }
 
-    public int getID() {
-        return ID;
+    public int getEnemigoId() {
+        return enemigoId;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    public int getTipoEnemigo() {
-        return tipoEnemigo;
-    }
-
-    public void setTipoEnemigo(int tipoEnemigo) {
-        this.tipoEnemigo = tipoEnemigo;
+    public int getPuntaje() {
+        return puntaje;
     }
 }

@@ -28,6 +28,7 @@ public class Juego extends JFrame implements Runnable{
     private final PuntajeDAO puntajeDAO;
     private final ConfiguracionDAO configuracionDAO;
     private final PlantaDAO plantaDAO;
+    private final EnemigoDAO enemigoDAO;
 
     private Thread hiloJuego;
 
@@ -50,6 +51,7 @@ public class Juego extends JFrame implements Runnable{
         puntajeDAO       = new PuntajeDAO(dbManager);
         configuracionDAO = new ConfiguracionDAO(dbManager);
         plantaDAO        = new PlantaDAO(dbManager);
+        enemigoDAO       = new EnemigoDAO(dbManager);
 
         SpriteManager.loadAll(); // Cargar todos los sprites antes de crear escenas
 
@@ -178,5 +180,6 @@ public class Juego extends JFrame implements Runnable{
     public PartidaDAO getPartidaDAO()             { return partidaDAO; }
     public PuntajeDAO getPuntajeDAO()             { return puntajeDAO; }
     public ConfiguracionDAO getConfiguracionDAO() { return configuracionDAO; }
-    public PlantaDAO getPlantaDAO() { return plantaDAO; }
+    public PlantaDAO getPlantaDAO()               { return plantaDAO; }
+    public EnemigoDAO getEnemigoDAO()             { return enemigoDAO; }
 }

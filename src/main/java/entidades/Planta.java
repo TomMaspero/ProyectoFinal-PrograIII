@@ -5,16 +5,14 @@ public class Planta {
     private String nombre;
     private int costoSol;
     private int dano;
-    private float velocidadAtaque;
     private String rutaSprite;
 
     public Planta() {}
 
-    public Planta(String nombre, int costoSol, int dano, float velocidadAtaque, String rutaSprite) {
+    public Planta(String nombre, int costoSol, int dano, String rutaSprite) {
         this.nombre = nombre;
         this.costoSol = costoSol;
         this.dano = dano;
-        this.velocidadAtaque = velocidadAtaque;
         this.rutaSprite = rutaSprite;
     }
 
@@ -29,9 +27,6 @@ public class Planta {
 
     public int getDano() { return dano; }
     public void setDano(int dano) { this.dano = dano; }
-
-    public float getVelocidadAtaque() { return velocidadAtaque; }
-    public void setVelocidadAtaque(float velocidadAtaque) { this.velocidadAtaque = velocidadAtaque; }
 
     public String getRutaSprite() { return rutaSprite; }
     public void setRutaSprite(String rutaSprite) { this.rutaSprite = rutaSprite; }

@@ -17,6 +17,9 @@ import static main.EstadoJuego.SetEstadoJuego;
  * Muestra un botón por cada planta cargada desde la base de datos.
  */
 public class Hotbar {
+    private static final java.awt.Font FONT_COST = new java.awt.Font("Arial", java.awt.Font.PLAIN, 9);
+    private static final Color COLOR_COST = new Color(80, 80, 80);
+
     private int x, y, width, height;
     private MyButton bMenu;
     private ArrayList<MyButton> plantButtons = new ArrayList<>();
@@ -82,13 +85,13 @@ public class Hotbar {
         }
 
         // Cost labels
-        g.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 9));
+        g.setFont(FONT_COST);
+        g.setColor(COLOR_COST);
         for (MyButton b : plantButtons) {
             for (Planta p : plantas) {
                 if (p.getPlantaId() == b.getId()) {
                     String cost = String.valueOf(p.getCostoSol());
                     int cw = g.getFontMetrics().stringWidth(cost);
-                    g.setColor(new Color(80, 80, 80));
                     g.drawString(cost,
                         b.getBounds().x + (b.getBounds().width - cw) / 2,
                         b.getBounds().y + b.getBounds().height + 10);
