@@ -49,6 +49,11 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int passiveSunTimer = 0;
     private static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2;
 
+    // Vidas
+    private int vidas = 5;
+    private boolean derrota = false;
+    private BufferedImage heartFull, heartEmpty;
+    
     private static class FloatingText {
         int x, y, ticksLeft, totalTicks;
         String text;
@@ -82,6 +87,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     // Offsets para centrar horizontalmente y alinear por la base
     private static final int SPRITE_OFF_X = (CELL_WIDTH  - SPRITE_W) / 2;
     private static final int SPRITE_OFF_Y =  CELL_HEIGHT - SPRITE_H - 8;
+    
+    // linea de muerte de los enemigos
+    private static final int DEATH_LINE_X = GRID_X - 20; // aprox 92px a la izq de la grilla
 
     public Jugando(Juego juego) {
         super(juego);
@@ -96,6 +104,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         fireTimers = new int[GRID_ROWS][GRID_COLS];
         sunTimers = new int[GRID_ROWS][GRID_COLS];
         solIcon = CargaGuarda.getSpriteAtlas("Sol.png");
+        heartFull = CargaGuarda.getSpriteAtlas("heart_full.png");
+        heartEmpty = CargaGuarda.getSpriteAtlas("heart_empty.png");
+        
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -127,17 +138,30 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     */
     
     public void update(){
+        if (derrota) {
+            return; // retornar si el juego termina
+        }
         updatePlantFiring();
         updateSunGeneration();
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         enemyManager.removeDeadEnemies();
+        
+        // resto al contador de vidas la cantidad de enemigos que hayan llegado al final
+        vidas -= enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
+        
+        if (vidas <= 0) {
+            vidas = 0;
+            derrota = true;
+        }
+        
         passiveSunTimer++;
         if (passiveSunTimer >= PASSIVE_SUN_INTERVAL) {
             passiveSunTimer = 0;
             sol += 25;
             floatingTexts.add(new FloatingText(555, 24, "+25", Color.YELLOW, 60, true));
         }
+        
         floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
     }
 

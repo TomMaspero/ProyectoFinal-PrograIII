@@ -10,6 +10,7 @@ import entidades.Enemigo;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -57,5 +58,19 @@ public class EnemyManager {
 
     public void removeDeadEnemies() {
         enemigos.removeIf(e -> e.getVida() <= 0);
+    }
+    
+    // retorna cuantos enemigos pasaron la linea
+    public int removeEnemiesPastLine(int posLineaX) {
+        int cont = 0;
+        Iterator<Enemigo> it = enemigos.iterator();
+        while (it.hasNext()) {
+            if (it.next().getX() <= posLineaX) {
+                it.remove();
+                cont++;
+            }
+        }
+        
+        return cont;
     }
 }
