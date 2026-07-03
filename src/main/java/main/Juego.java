@@ -111,6 +111,7 @@ public class Juego extends JFrame implements Runnable{
                 updates = 0;
                 lastTimeCheck = System.currentTimeMillis();
             }
+            
         }
     }
     

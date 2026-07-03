@@ -13,6 +13,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
@@ -20,6 +21,7 @@ import managers.MusicManager;
 import managers.TileManager;
 import main.EstadoJuego;
 import managers.CombatManager;
+import managers.WaveManager;
 
 /**
  * Escena principal del juego.
@@ -33,6 +35,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private Hotbar hotbar;
     private EnemyManager enemyManager;
     private CombatManager combatManager;
+    private WaveManager waveManager;
     private int mouseX, mouseY;
 
     private int[][] fireTimers;
@@ -98,7 +101,6 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
-
         enemyManager = new EnemyManager(this);
         combatManager = new CombatManager(this);
         fireTimers = new int[GRID_ROWS][GRID_COLS];
@@ -106,7 +108,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         solIcon = CargaGuarda.getSpriteAtlas("Sol.png");
         heartFull = CargaGuarda.getSpriteAtlas("heart_full.png");
         heartEmpty = CargaGuarda.getSpriteAtlas("heart_empty.png");
-        
+        waveManager = new WaveManager(enemyManager, GRID_Y, CELL_HEIGHT, GRID_ROWS, 640);
+
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -143,10 +146,11 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
         updatePlantFiring();
         updateSunGeneration();
+        waveManager.update();
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
+        checkPlantZombieCollisions();
         enemyManager.removeDeadEnemies();
-        
         // resto al contador de vidas la cantidad de enemigos que hayan llegado al final
         vidas -= enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
         
@@ -356,10 +360,35 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                             floatingTexts.add(new FloatingText(x - 40, y, "No hay suficiente Sol!", Color.RED, 90, false));
                     }
                 }
-            } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
+            } else if (showDebugGrid && x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
                 enemyManager.agregaEnemigo(x, y);   
-            } 
+}
             // Combat manager agrega proyectil en x y 
+        }
+    }
+    
+    private void checkPlantZombieCollisions() {
+    Iterator<Enemigo> it = enemyManager.getEnemigos().iterator();
+    while (it.hasNext()) {
+        Enemigo e = it.next();
+        
+        // Which grid column is the zombie's left edge in?
+        int col = (int)((e.getX() - GRID_X) / CELL_WIDTH);
+        
+        // Which grid row? Use the zombie's vertical center
+        int row = (int)((e.getY() + 16 - GRID_Y) / CELL_HEIGHT);
+        // The +16 is half the zombie's collision height (32/2), 
+        // centering the check on the zombie's vertical middle
+        
+        // Bounds check
+        if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS)
+            continue;
+        
+        // Is there a plant in this cell?
+        if (lvl[row][col] != 0) {
+            lvl[row][col] = 0;   // remove the plant from the grid
+            it.remove();          // remove the zombie
+            }
         }
     }
 
