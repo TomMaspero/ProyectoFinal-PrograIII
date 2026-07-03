@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 03, 2026 at 10:02 PM
+-- Generation Time: Jul 04, 2026 at 01:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -20,19 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `plantsvszombies`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `configuracion`
---
-
-CREATE TABLE `configuracion` (
-  `jugadorId` int(11) NOT NULL,
-  `volumen` int(11) DEFAULT 50,
-  `dificultad` varchar(20) DEFAULT 'NORMAL',
-  `pantalla_completa` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -78,7 +65,8 @@ CREATE TABLE `jugadores` (
 INSERT INTO `jugadores` (`jugadorId`, `nombre`, `fecha_registro`) VALUES
 (49, 'ASD', '2026-07-03 16:19:41'),
 (50, 'POO', '2026-07-03 16:28:20'),
-(51, 'PPP', '2026-07-03 16:55:25');
+(51, 'PPP', '2026-07-03 16:55:25'),
+(52, '444', '2026-07-03 17:22:58');
 
 -- --------------------------------------------------------
 
@@ -92,6 +80,7 @@ CREATE TABLE `partidas` (
   `oleadas_superadas` int(11) DEFAULT 0,
   `zombies_eliminados` int(11) DEFAULT 0,
   `plantas_perdidas` int(11) DEFAULT 0,
+  `puntuacion` int(11) NOT NULL DEFAULT 0,
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -99,10 +88,11 @@ CREATE TABLE `partidas` (
 -- Dumping data for table `partidas`
 --
 
-INSERT INTO `partidas` (`partidaId`, `jugadorId`, `oleadas_superadas`, `zombies_eliminados`, `plantas_perdidas`, `fecha`) VALUES
-(1, 49, 1, 2, 0, '2026-07-03 16:19:41'),
-(2, 50, 4, 170, 10, '2026-07-03 16:28:20'),
-(3, 51, 4, 184, 17, '2026-07-03 16:55:25');
+INSERT INTO `partidas` (`partidaId`, `jugadorId`, `oleadas_superadas`, `zombies_eliminados`, `plantas_perdidas`, `puntuacion`, `fecha`) VALUES
+(1, 49, 1, 2, 0, 11, '2026-07-03 16:19:41'),
+(2, 50, 4, 170, 10, 396, '2026-07-03 16:28:20'),
+(3, 51, 4, 184, 17, 410, '2026-07-03 16:55:25'),
+(4, 52, 1, 0, 0, 0, '2026-07-03 17:22:58');
 
 -- --------------------------------------------------------
 
@@ -127,37 +117,9 @@ INSERT INTO `plantas` (`plantaId`, `nombre`, `costo_sol`, `dano`, `ruta_sprite`)
 (2, 'Sunflower', 50, 0, 'sunflower.png'),
 (3, 'Pala', 0, 0, 'pala.png');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `puntajes`
---
-
-CREATE TABLE `puntajes` (
-  `puntajeId` int(11) NOT NULL,
-  `jugadorId` int(11) NOT NULL,
-  `puntuacion` int(11) NOT NULL,
-  `fecha` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `puntajes`
---
-
-INSERT INTO `puntajes` (`puntajeId`, `jugadorId`, `puntuacion`, `fecha`) VALUES
-(1, 49, 11, '2026-07-03 16:19:41'),
-(2, 50, 396, '2026-07-03 16:28:20'),
-(3, 51, 410, '2026-07-03 16:55:25');
-
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `configuracion`
---
-ALTER TABLE `configuracion`
-  ADD PRIMARY KEY (`jugadorId`);
 
 --
 -- Indexes for table `enemigos`
@@ -186,13 +148,6 @@ ALTER TABLE `plantas`
   ADD PRIMARY KEY (`plantaId`);
 
 --
--- Indexes for table `puntajes`
---
-ALTER TABLE `puntajes`
-  ADD PRIMARY KEY (`puntajeId`),
-  ADD KEY `jugadorId` (`jugadorId`);
-
---
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -206,13 +161,13 @@ ALTER TABLE `enemigos`
 -- AUTO_INCREMENT for table `jugadores`
 --
 ALTER TABLE `jugadores`
-  MODIFY `jugadorId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `jugadorId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `partidas`
 --
 ALTER TABLE `partidas`
-  MODIFY `partidaId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `partidaId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `plantas`
@@ -221,32 +176,14 @@ ALTER TABLE `plantas`
   MODIFY `plantaId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `puntajes`
---
-ALTER TABLE `puntajes`
-  MODIFY `puntajeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `configuracion`
---
-ALTER TABLE `configuracion`
-  ADD CONSTRAINT `configuracion_ibfk_1` FOREIGN KEY (`jugadorId`) REFERENCES `jugadores` (`jugadorId`);
 
 --
 -- Constraints for table `partidas`
 --
 ALTER TABLE `partidas`
   ADD CONSTRAINT `partidas_ibfk_1` FOREIGN KEY (`jugadorId`) REFERENCES `jugadores` (`jugadorId`);
-
---
--- Constraints for table `puntajes`
---
-ALTER TABLE `puntajes`
-  ADD CONSTRAINT `puntajes_ibfk_1` FOREIGN KEY (`jugadorId`) REFERENCES `jugadores` (`jugadorId`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
