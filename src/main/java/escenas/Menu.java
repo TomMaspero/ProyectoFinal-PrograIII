@@ -6,13 +6,20 @@ package escenas;
 
 import IU.MyButton;
 import helpers.CargaGuarda;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import static main.EstadoJuego.*;
 import main.Juego;
 import managers.MusicManager;
@@ -53,7 +60,36 @@ public class Menu extends EscenaJuego implements MetodosEscena{
                 return false;
             }
         };
+
+        tablaHighscores.setRowHeight(28);
+        tablaHighscores.setFont(new Font("Arial", Font.PLAIN, 14));
+        tablaHighscores.setGridColor(new Color(200, 200, 200));
+        tablaHighscores.setRowSelectionAllowed(false);
+        tablaHighscores.setFocusable(false);
+        tablaHighscores.setBackground(Color.WHITE);
+        tablaHighscores.setFillsViewportHeight(true); // evita el gris de fondo cuando hay pocas filas
+
+        DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(235, 245, 235));
+                return c;
+            }
+        };
+        tablaHighscores.setDefaultRenderer(Object.class, renderer);
+
+        JTableHeader header = tablaHighscores.getTableHeader();
+        header.setFont(new Font("Arial", Font.BOLD, 14));
+        header.setBackground(new Color(60, 120, 60));
+        header.setForeground(Color.WHITE);
+        header.setReorderingAllowed(false);
+
         scrollHighscores = new JScrollPane(tablaHighscores);
+        scrollHighscores.getViewport().setBackground(Color.WHITE);
+        scrollHighscores.setBorder(BorderFactory.createLineBorder(new Color(60, 120, 60), 2));
         // Coordenadas reales de pantalla (1280x920) — a la derecha del boton Highscores
         scrollHighscores.setBounds(780, 440, 460, 300);
     }
@@ -131,6 +167,9 @@ public class Menu extends EscenaJuego implements MetodosEscena{
         }
 
         tablaHighscores.setModel(new DefaultTableModel(datos, columnas));
+        tablaHighscores.getColumnModel().getColumn(0).setPreferredWidth(160);
+        tablaHighscores.getColumnModel().getColumn(1).setPreferredWidth(180);
+        tablaHighscores.getColumnModel().getColumn(2).setPreferredWidth(100);
 
         getJuego().getPantalla().add(scrollHighscores);
         getJuego().getPantalla().revalidate();
