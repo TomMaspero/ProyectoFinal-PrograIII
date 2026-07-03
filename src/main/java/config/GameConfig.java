@@ -9,10 +9,9 @@ package config;
 public class GameConfig {
 
     // Oleadas (WaveManager) 
-    public static final int WAVE_BASE_INTERVAL = 600;     // ticks entre spawns (10s a 60 UPS)
     public static final int WAVE_RANDOM_OFFSET_MAX = 180; // variacion aleatoria extra (0-3s)
     public static final int[] WAVE_UMBRALES_PUNTOS = {0, 30, 80, 200, 500};
-    public static final int[] WAVE_INTERVALOS_BASE = {300, 240, 180, 120, 90};
+    public static final int[] WAVE_INTERVALOS_BASE = {420, 360, 300, 240, 120}; // ticks entre spawns (empezando en 7s a 60 UPS)
 
     // Combate 
     public static final float PROYECTIL_VELOCIDAD = 1.75f;
