@@ -151,7 +151,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     
     public void update(){
         if (derrota) {
-            return; // retornar si el juego termina
+        //    return; // retornar si el juego termina
         }
         updatePlantFiring();
         updateSunGeneration();
