@@ -18,6 +18,7 @@ public class SpriteManager {
     private static BufferedImage[] sunflowerIdleFrames;
     private static BufferedImage peaSprite;
     private static BufferedImage peaSplatSprite;
+    private static BufferedImage palaSprite;
 
     /** Carga todos los atlas. Llamar una sola vez antes de crear TileManager. */
     public static void loadAll() {
@@ -25,6 +26,7 @@ public class SpriteManager {
         peaSheet = new SpriteSheet("peaAtlas.png", 29, 31);
         peaSprite = CargaGuarda.getSpriteAtlas("pea.png");
         peaSplatSprite = CargaGuarda.getSpriteAtlas("pea_splat.png");
+        palaSprite = CargaGuarda.getSpriteAtlas("pala.png");
         loadSunflowerFrames();
     }
 
@@ -48,12 +50,13 @@ public class SpriteManager {
      * Devuelve el primer frame idle de una planta.
      * Usado para el sprite estático en la hotbar y en el grid.
      *
-     * @param plantaId ID de la planta en la tabla 'plantas' (1=Peashooter, 2=Sunflower)
+     * @param plantaId ID de la planta en la tabla 'plantas' (1=Peashooter, 2=Sunflower, 3=Pala)
      */
     public static BufferedImage getStaticSprite(int plantaId) {
         return switch (plantaId) {
             case 1 -> peaSheet.getFrame(0, 0);
             case 2 -> sunflowerIdleFrames[0];
+            case 3 -> palaSprite;
             default -> null;
         };
     }

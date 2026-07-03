@@ -80,7 +80,8 @@ CREATE TABLE plantas (
 
 INSERT INTO plantas (nombre, costo_sol, dano, ruta_sprite)
 VALUES ('Peashooter', 100, 20, 'peaAtlas.png'),
-       ('Sunflower',  50,  0, 'sunflower.png');
+       ('Sunflower',  50,  0, 'sunflower.png'),
+       ('Pala',       0,   0, 'pala.png');
 ```
 
 ---

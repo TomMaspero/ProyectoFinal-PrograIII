@@ -388,6 +388,13 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         return 0;
     }
 
+    private boolean esPala(int plantaId) {
+        for (Planta p : plantas) {
+            if (p.getPlantaId() == plantaId) return "Pala".equals(p.getNombre());
+        }
+        return false;
+    }
+
     private void mostrarMensajeOleada(int numeroOleada) {
         mensajeOleada = "Oleada " + numeroOleada;
         mensajeOleadaTicks = MENSAJE_OLEADA_DURACION;
@@ -439,17 +446,20 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             if (sel != 0) {
                 int col = (x - GRID_X) / CELL_WIDTH;
                 int row = (y - GRID_Y) / CELL_HEIGHT;
-                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
-                        && lvl[row][col] == 0) {
-                    int costo = getCostoPlanta(sel);
-                    if (sol >= costo) {
-                        lvl[row][col] = sel;
-                        sol -= costo;
-                    } else {
-                        boolean yaHayError = floatingTexts.stream()
-                                .anyMatch(ft -> ft.color == Color.RED);
-                        if (!yaHayError)
-                            floatingTexts.add(new FloatingText(x - 40, y, "No hay suficiente Sol!", Color.RED, 90, false));
+                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
+                    if (esPala(sel)) {
+                        lvl[row][col] = 0; // la pala remueve lo que haya en la celda
+                    } else if (lvl[row][col] == 0) {
+                        int costo = getCostoPlanta(sel);
+                        if (sol >= costo) {
+                            lvl[row][col] = sel;
+                            sol -= costo;
+                        } else {
+                            boolean yaHayError = floatingTexts.stream()
+                                    .anyMatch(ft -> ft.color == Color.RED);
+                            if (!yaHayError)
+                                floatingTexts.add(new FloatingText(x - 40, y, "No hay suficiente Sol!", Color.RED, 90, false));
+                        }
                     }
                 }
             } else if (showDebugGrid && x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
