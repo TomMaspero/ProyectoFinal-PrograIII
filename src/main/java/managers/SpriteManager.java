@@ -16,11 +16,15 @@ public class SpriteManager {
 
     private static SpriteSheet peaSheet;
     private static BufferedImage[] sunflowerIdleFrames;
+    private static BufferedImage peaSprite;
+    private static BufferedImage peaSplatSprite;
 
     /** Carga todos los atlas. Llamar una sola vez antes de crear TileManager. */
     public static void loadAll() {
         // peaAtlas.png: 234 px / 9 cols = 29 px por frame; filas de planta = 31 px
         peaSheet = new SpriteSheet("peaAtlas.png", 29, 31);
+        peaSprite = CargaGuarda.getSpriteAtlas("pea.png");
+        peaSplatSprite = CargaGuarda.getSpriteAtlas("pea_splat.png");
         loadSunflowerFrames();
     }
 
@@ -75,5 +79,13 @@ public class SpriteManager {
      */
     public static Animation createIdleAnimation(int plantaId, int ticksPerFrame) {
         return new Animation(getIdleFrames(plantaId), ticksPerFrame);
+    }
+
+    public static BufferedImage getPeaSprite() {
+        return peaSprite;
+    }
+
+    public static BufferedImage getPeaSplatSprite() {
+        return peaSplatSprite;
     }
 }

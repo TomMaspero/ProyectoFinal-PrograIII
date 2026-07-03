@@ -51,5 +51,11 @@ public class EnemyManager {
         g.drawImage(imgEnemigos[0],(int) e.getX(),(int) e.getY(), null);
     }
 
-    
-}   
+    public ArrayList<Enemigo> getEnemigos() {
+        return enemigos;
+    }
+
+    public void removeDeadEnemies() {
+        enemigos.removeIf(e -> e.getVida() <= 0);
+    }
+}
