@@ -40,6 +40,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     private int[][] fireTimers;
     private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
+    private final boolean[] rowHasEnemy = new boolean[GRID_ROWS]; // reusado cada tick, evita reescanear
 
     // Sol 
     private int sol = 200;
@@ -204,20 +205,22 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
     }
 
-    private boolean enemyInRow(int row) {
-        int rowTop = GRID_Y + row * CELL_HEIGHT;
-        int rowBottom = rowTop + CELL_HEIGHT;
+    /** Marca en rowHasEnemy[] qué filas tienen al menos un enemigo. Una sola pasada sobre la lista. */
+    private void computeRowsWithEnemies() {
+        for (int r = 0; r < GRID_ROWS; r++)
+            rowHasEnemy[r] = false;
         for (Enemigo e : enemyManager.getEnemigos()) {
             float cy = e.getY() + e.getColision().height / 2f;
-            if (cy >= rowTop && cy < rowBottom)
-                return true;
+            int row = (int) ((cy - GRID_Y) / CELL_HEIGHT);
+            if (row >= 0 && row < GRID_ROWS)
+                rowHasEnemy[row] = true;
         }
-        return false;
     }
 
     private void updatePlantFiring() {
+        computeRowsWithEnemies();
         for (int row = 0; row < GRID_ROWS; row++) {
-            boolean hasEnemy = enemyInRow(row);
+            boolean hasEnemy = rowHasEnemy[row];
             for (int col = 0; col < GRID_COLS; col++) {
                 if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 1 && hasEnemy) {
                     fireTimers[row][col]++;
