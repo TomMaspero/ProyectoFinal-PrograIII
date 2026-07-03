@@ -4,6 +4,7 @@
  */
 package managers;
 
+import config.GameConfig;
 import helpers.CargaGuarda;
 import escenas.Jugando;
 import entidades.Enemigo;
@@ -86,7 +87,7 @@ public class EnemyManager {
     
     public void update(){
         for(Enemigo e : enemigos)
-            e.mover(-0.2f, 0);
+            e.mover(GameConfig.ZOMBIE_VELOCIDAD, 0);
     }
     
     public void draw(Graphics g){

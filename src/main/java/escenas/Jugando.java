@@ -1,6 +1,7 @@
 package escenas;
 
 import IU.Hotbar;
+import config.GameConfig;
 import entidades.Enemigo;
 import entidades.Jugador;
 import entidades.Partida;
@@ -44,28 +45,25 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int mouseX, mouseY;
 
     private int[][] fireTimers;
-    private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
     private final boolean[] rowHasEnemy = new boolean[GRID_ROWS]; // reusado cada tick, evita reescanear
 
-    // Sol 
-    private int sol = 200;
+    // Sol
+    private int sol = GameConfig.SOL_INICIAL;
     private int[][] sunTimers;
-    private static final int SUN_INTERVAL = 480; // 480 / 60 UPS = 8.0s
     private List<Planta> plantas;
     private BufferedImage solIcon;
     private ArrayList<FloatingText> floatingTexts = new ArrayList<>();
 
     private int passiveSunTimer = 0;
-    private static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2;
 
     // Puntos
     private int puntos = 0; // Puntuacion total
     private int plantasPerdidas = 0;
     private int zombiesEliminados = 0;
     private int zombiesEnLimite = 0;
-    
+
     // Vidas
-    private int vidas = 5;
+    private int vidas = GameConfig.VIDAS_INICIALES;
     private boolean derrota = false;
     private BufferedImage heartFull, heartEmpty;
     
@@ -203,9 +201,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
         
         passiveSunTimer++;
-        if (passiveSunTimer >= PASSIVE_SUN_INTERVAL) {
+        if (passiveSunTimer >= GameConfig.PASSIVE_SUN_INTERVAL) {
             passiveSunTimer = 0;
-            sol += 25;
+            sol += GameConfig.SOL_POR_GENERACION;
             floatingTexts.add(new FloatingText(555, 24, "+25", Color.YELLOW, 60, true));
         }
         
@@ -217,9 +215,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             for (int col = 0; col < GRID_COLS; col++) {
                 if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 2) { // Si hay un girasol colocado
                     sunTimers[row][col]++;
-                    if (sunTimers[row][col] >= SUN_INTERVAL) {
+                    if (sunTimers[row][col] >= GameConfig.SUN_INTERVAL) {
                         sunTimers[row][col] = 0;
-                        sol += 25;
+                        sol += GameConfig.SOL_POR_GENERACION;
                         int tx = GRID_X + col * CELL_WIDTH;
                         int ty = GRID_Y + row * CELL_HEIGHT;
                         floatingTexts.add(new FloatingText(tx, ty, "+25", Color.YELLOW, 60, false));
@@ -250,7 +248,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             for (int col = 0; col < GRID_COLS; col++) {
                 if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 1 && hasEnemy) {
                     fireTimers[row][col]++;
-                    if (fireTimers[row][col] >= FIRE_INTERVAL) {
+                    if (fireTimers[row][col] >= GameConfig.FIRE_INTERVAL) {
                         fireTimers[row][col] = 0;
                         float spawnX = GRID_X + col * CELL_WIDTH + CELL_WIDTH;
                         float spawnY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT / 2 - 8;
@@ -330,7 +328,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
 
         // Contador de vidas
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < GameConfig.VIDAS_INICIALES; i++) {
             BufferedImage corazon = (i < vidas) ? heartFull : heartEmpty;
             g.drawImage(corazon, 20 + i * 18, 4, 16, 16, null);
         }

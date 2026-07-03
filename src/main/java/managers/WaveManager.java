@@ -8,6 +8,7 @@ package managers;
  *
  * @author Lucio
  */
+import config.GameConfig;
 import escenas.Jugando;
 import java.util.Random;
 
@@ -24,11 +25,6 @@ public class WaveManager {
     private int gridRows;
     private int spawnX;  // coords de spawn para los zombies
 
-    private static final int BASE_INTERVAL = 300;      // intervalo de spawn (5 s/60UPS)
-    private static final int RANDOM_OFFSET_MAX = 180;   // intervalo random 0,3 seg
-    
-    private static final int[] UMBRALES_PUNTOS   = {0, 30, 80, 200, 500};
-    private static final int[] INTERVALOS_BASE   = {300, 240, 180, 120, 90};
     private int nivelActual = 0;
     private int oleadaActual = 1;
     private Jugando jugando;
@@ -56,22 +52,22 @@ public class WaveManager {
     private void actualizarNivelDificultad() {
         int puntosActuales = jugando.getPuntos();
         int nuevoNivel = 0;
-        
-        for (int i = 0; i < UMBRALES_PUNTOS.length; i++) {
-            if (puntosActuales >= UMBRALES_PUNTOS[i]) {
+
+        for (int i = 0; i < GameConfig.WAVE_UMBRALES_PUNTOS.length; i++) {
+            if (puntosActuales >= GameConfig.WAVE_UMBRALES_PUNTOS[i]) {
                 nuevoNivel = i;
             }
         }
-        
+
         if (nuevoNivel > nivelActual) {
             nivelActual = nuevoNivel;
             oleadaActual++;
         }
     }
-    
+
     private int calcularSiguienteSpawn() {
-        int baseActual = INTERVALOS_BASE[nivelActual];
-        return baseActual + random.nextInt(RANDOM_OFFSET_MAX);
+        int baseActual = GameConfig.WAVE_INTERVALOS_BASE[nivelActual];
+        return baseActual + random.nextInt(GameConfig.WAVE_RANDOM_OFFSET_MAX);
     }
 
     private void spawnZombie() {
