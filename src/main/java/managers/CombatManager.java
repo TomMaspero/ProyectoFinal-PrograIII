@@ -33,7 +33,7 @@ public class CombatManager {
             p.update();
             if (!p.isSplatting() && p.isActivo()) {
                 for (Enemigo e : enemigos) {
-                    if (e.getVida() > 0 && p.getColision().intersects(e.getColision())) {
+                    if (e.getVida() > 0 && p.getColision().intersects(e.getColision())) { // Un zombie y un proyectil colisionan
                         e.setVida(e.getVida() - p.getDanio());
                         p.hit();
                         break;

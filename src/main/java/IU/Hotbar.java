@@ -2,6 +2,7 @@ package IU;
 
 import entidades.Planta;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class Hotbar {
     private void initButtons(List<Planta> plantas, TileManager tileManager) {
         bMenu = new MyButton("Menu", 2, y, 100, 30);
 
-        int btnW = 50;
+        int btnW = 75;
         int btnH = 50;
         int xStart = 110;
         int xOffset = (int)(btnW * 1.1f);
@@ -91,6 +92,7 @@ public class Hotbar {
                 }
             }
         }
+
     }
 
     public void mouseClicked(int x, int y) { }

@@ -103,8 +103,11 @@ public class EnemyManager {
         return enemigos;
     }
 
-    public void removeDeadEnemies() {
-        enemigos.removeIf(e -> e.getVida() <= 0);
+    public int removeDeadEnemies() {
+        int tamInicio = enemigos.size(); // Cuenta los enemigos
+        enemigos.removeIf(e -> e.getVida() <= 0); // Resta los muertos
+        int tamFinal = tamInicio - enemigos.size();
+        return tamFinal;
     }
     
     // retorna cuantos enemigos pasaron la linea
