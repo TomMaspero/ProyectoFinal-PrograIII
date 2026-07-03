@@ -1,6 +1,8 @@
 package entidades;
 
 public class Proyectil extends Entidad {
+    // Línea de muerte del proyectil: si no impacta, se elimina al pasar el borde derecho (640px)
+    private static final float DESPAWN_X = 640f;
     private int danio = 20;
     private float velocidad = 2.0f;
     private int fila;
@@ -17,12 +19,11 @@ public class Proyectil extends Entidad {
         if (splatting) {
             splatTicks++;
             if (splatTicks >= 5){
-                System.out.println("suma tick");
                 activo = false;
             }
             return;
         }
-        if (getX() > 640)
+        if (getX() > DESPAWN_X)
             activo = false;
         else
             mover(velocidad, 0);

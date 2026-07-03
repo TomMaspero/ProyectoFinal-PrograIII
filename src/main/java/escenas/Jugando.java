@@ -40,6 +40,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     private int[][] fireTimers;
     private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
+    private final boolean[] rowHasEnemy = new boolean[GRID_ROWS]; // reusado cada tick, evita reescanear
 
     // Sol 
     private int sol = 200;
@@ -68,6 +69,19 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             this.totalTicks = ticks; this.down = down;
         }
     }
+
+    // Fonts reutilizados (evita crear objetos nuevos cada frame)
+    private static final Font FONT_FT       = new Font("Arial", Font.BOLD, 10);
+    private static final Font FONT_SOL      = new Font("Arial", Font.BOLD, 12);
+    private static final Font FONT_DEBUG_BTN = new Font("Arial", Font.PLAIN, 9);
+    private static final Font FONT_DEBUG_GRID = new Font("Arial", Font.BOLD, 7);
+    private static final Font FONT_DERROTA  = new Font("Arial", Font.BOLD, 40);
+    private static final Font FONT_MENU_BTN = new Font("Arial", Font.BOLD, 14);
+
+    private static final AlphaComposite ALPHA_GHOST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f);
+    private static final AlphaComposite ALPHA_FULL  = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f);
+    private static final AlphaComposite ALPHA_OVERLAY = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f);
+    private static final AlphaComposite ALPHA_DEBUG = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.18f);
 
     // Debug grid overlay
     private boolean showDebugGrid = false;
@@ -191,20 +205,22 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
     }
 
-    private boolean enemyInRow(int row) {
-        int rowTop = GRID_Y + row * CELL_HEIGHT;
-        int rowBottom = rowTop + CELL_HEIGHT;
+    /** Marca en rowHasEnemy[] qué filas tienen al menos un enemigo. Una sola pasada sobre la lista. */
+    private void computeRowsWithEnemies() {
+        for (int r = 0; r < GRID_ROWS; r++)
+            rowHasEnemy[r] = false;
         for (Enemigo e : enemyManager.getEnemigos()) {
             float cy = e.getY() + e.getColision().height / 2f;
-            if (cy >= rowTop && cy < rowBottom)
-                return true;
+            int row = (int) ((cy - GRID_Y) / CELL_HEIGHT);
+            if (row >= 0 && row < GRID_ROWS)
+                rowHasEnemy[row] = true;
         }
-        return false;
     }
 
     private void updatePlantFiring() {
+        computeRowsWithEnemies();
         for (int row = 0; row < GRID_ROWS; row++) {
-            boolean hasEnemy = enemyInRow(row);
+            boolean hasEnemy = rowHasEnemy[row];
             for (int col = 0; col < GRID_COLS; col++) {
                 if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 1 && hasEnemy) {
                     fireTimers[row][col]++;
@@ -246,7 +262,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         if (plantaSeleccionadaId != 0) {
             BufferedImage ghostSpr = tileManager.getSpriteByPlantaId(plantaSeleccionadaId);
             Graphics2D g2d = (Graphics2D) g;
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f));
+            g2d.setComposite(ALPHA_GHOST);
 
             int col = (mouseX - GRID_X) / CELL_WIDTH;
             int row = (mouseY - GRID_Y) / CELL_HEIGHT;
@@ -268,7 +284,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                     null);
             }
 
-            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+            g2d.setComposite(ALPHA_FULL);
         }
 
         // Hotbar
@@ -279,8 +295,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         combatManager.draw(g);
 
         // Texto flotante de + 25
-        Font ftFont = new Font("Arial", Font.BOLD, 10);
-        g.setFont(ftFont);
+        g.setFont(FONT_FT);
         for (FloatingText ft : floatingTexts) {
             int elapsed = ft.totalTicks - ft.ticksLeft;
             int drawY = ft.down ? ft.y + elapsed : ft.y - elapsed;
@@ -297,7 +312,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Contador de Sol
         g.drawImage(solIcon, 555, 4, 20, 20, null);
         g.setColor(Color.YELLOW);
-        g.setFont(new Font("Arial", Font.BOLD, 12));
+        g.setFont(FONT_SOL);
         g.drawString(String.valueOf(sol), 578, 18);
 
         // Debug overlay (siempre encima de todo)
@@ -412,14 +427,14 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         Graphics2D g2d = (Graphics2D) g;
         
         // overlay gris cubriendo la pantalla entera
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f)); // opacidad 60% para el overlay
+        g2d.setComposite(ALPHA_OVERLAY);
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, 640, 460);
-        
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f)); // opacidad 100% para el texto
-        
+
+        g2d.setComposite(ALPHA_FULL);
+
         // Texto de derrota
-        g2d.setFont(new Font("Arial", Font.BOLD, 40));
+        g2d.setFont(FONT_DERROTA);
         String msg = "Derrota";
         int msgW = g2d.getFontMetrics().stringWidth(msg);
         g2d.setColor(Color.RED);
@@ -431,7 +446,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g2d.fillRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
         g2d.setColor(Color.WHITE);
         g2d.drawRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
-        g2d.setFont(new Font("Arial", Font.BOLD, 14));
+        g2d.setFont(FONT_MENU_BTN);
         String btnText = "Volver al Menu";
         int btnW = g2d.getFontMetrics().stringWidth(btnText);
         g2d.drawString(btnText, menuBtn.x + (menuBtn.width - btnW) / 2, menuBtn.y + 23);
@@ -443,7 +458,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g.setColor(showDebugGrid ? new Color(200, 0, 0) : new Color(60, 60, 60));
         g.fillRect(DEBUG_BTN.x, DEBUG_BTN.y, DEBUG_BTN.width, DEBUG_BTN.height);
         g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.PLAIN, 9));
+        g.setFont(FONT_DEBUG_BTN);
         String label = showDebugGrid ? "Debug: ON" : "Debug: OFF";
         int lw = g.getFontMetrics().stringWidth(label);
         g.drawString(label, DEBUG_BTN.x + (DEBUG_BTN.width - lw) / 2,
@@ -452,8 +467,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     private void drawDebugGrid(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        Font labelFont = new Font("Arial", Font.BOLD, 7);
-        g2d.setFont(labelFont);
+        g2d.setFont(FONT_DEBUG_GRID);
 
         for (int row = 0; row < GRID_ROWS; row++) {
             for (int col = 0; col < GRID_COLS; col++) {
@@ -461,12 +475,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                 int cy = GRID_Y + row * CELL_HEIGHT;
 
                 // Semi-transparent red fill
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.18f));
+                g2d.setComposite(ALPHA_DEBUG);
                 g2d.setColor(Color.RED);
                 g2d.fillRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
 
                 // Solid red border
-                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+                g2d.setComposite(ALPHA_FULL);
                 g2d.setColor(Color.RED);
                 g2d.drawRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
 
@@ -492,7 +506,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g2d.drawString("(" + GRID_X + "," + GRID_Y + ")", GRID_X + 5, GRID_Y - 2);
         
         // linea limite de zombies
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        g2d.setComposite(ALPHA_FULL);
         g2d.setColor(Color.BLUE);
         g2d.drawLine(DEATH_LINE_X, GRID_Y, DEATH_LINE_X, GRID_BOTTOM);
     }
