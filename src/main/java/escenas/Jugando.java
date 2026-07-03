@@ -69,6 +69,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     // Debug grid overlay
     private boolean showDebugGrid = false;
     private static final Rectangle DEBUG_BTN = new Rectangle(565, 344, 70, 14);
+    
+    // boton derrota para volver al menu ppal
+    private static final Rectangle MENU_BTN_DERROTA = new Rectangle(245, 210, 150, 35);
 
     // Constantes del grid — calibradas sobre yard_resize.png (640×360)
     // Área de pasto: x=112–454 (9×38px), y=42–342 (5×60px)
@@ -296,6 +299,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
         drawDebugToggle(g);
+
+        if (derrota) {
+            renderDerrota(g);
+        }
     }
 
     private int getCostoPlanta(int plantaId) {
@@ -330,6 +337,14 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
     @Override
     public void mouseReleased(int x, int y) {
+        if (derrota) {
+            if (MENU_BTN_DERROTA.contains(x, y)) {
+                EstadoJuego.SetEstadoJuego(EstadoJuego.MENU);
+                MusicManager.playMenuTheme();
+            }
+            return;
+        }
+        
         if (DEBUG_BTN.contains(x, y)) {
             showDebugGrid = !showDebugGrid;
             return;
@@ -363,6 +378,36 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
     }
 
+    // render que se muestra cuando se le acaban las vidas al jugador
+    public void renderDerrota(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        
+        // overlay gris cubriendo la pantalla entera
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f)); // opacidad 60% para el overlay
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, 640, 460);
+        
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f)); // opacidad 100% para el texto
+        
+        // Texto de derrota
+        g2d.setFont(new Font("Arial", Font.BOLD, 40));
+        String msg = "Derrota";
+        int msgW = g2d.getFontMetrics().stringWidth(msg);
+        g2d.setColor(Color.RED);
+        g2d.drawString(msg, 320 - msgW / 2, 180);
+        
+        // Boton menu
+        Rectangle menuBtn = new Rectangle(245, 210, 150, 35);
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.fillRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
+        g2d.setFont(new Font("Arial", Font.BOLD, 14));
+        String btnText = "Volver al Menu";
+        int btnW = g2d.getFontMetrics().stringWidth(btnText);
+        g2d.drawString(btnText, menuBtn.x + (menuBtn.width - btnW) / 2, menuBtn.y + 23);
+    }
+    
     // ── Debug helpers ────────────────────────────────────────────────────────
 
     private void drawDebugToggle(Graphics g) {
