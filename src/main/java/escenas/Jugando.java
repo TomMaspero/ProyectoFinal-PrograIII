@@ -370,7 +370,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g.fillRect(DEBUG_BTN.x, DEBUG_BTN.y, DEBUG_BTN.width, DEBUG_BTN.height);
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.PLAIN, 9));
-        String label = showDebugGrid ? "Grid: ON" : "Grid: OFF";
+        String label = showDebugGrid ? "Debug: ON" : "Debug: OFF";
         int lw = g.getFontMetrics().stringWidth(label);
         g.drawString(label, DEBUG_BTN.x + (DEBUG_BTN.width - lw) / 2,
                             DEBUG_BTN.y + DEBUG_BTN.height - 3);
@@ -416,5 +416,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g2d.fillOval(GRID_X - 3, GRID_Y - 3, 6, 6);
         g2d.setColor(Color.CYAN);
         g2d.drawString("(" + GRID_X + "," + GRID_Y + ")", GRID_X + 5, GRID_Y - 2);
+        
+        // linea limite de zombies
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+        g2d.setColor(Color.BLUE);
+        g2d.drawLine(DEATH_LINE_X, GRID_Y, DEATH_LINE_X, GRID_BOTTOM);
     }
 }
