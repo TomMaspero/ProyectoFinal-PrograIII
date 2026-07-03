@@ -6,7 +6,11 @@ package IU;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GradientPaint;
+import java.awt.RenderingHints;
 import java.awt.Rectangle;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -20,33 +24,24 @@ public class MyButton {
     private String text;
     private Rectangle bounds;
     private boolean mouseOver, mousePressed;
-    /**
-     * Constructor base para los botones de la IU del juego
-     * @param text Nombre del boton
-     * @param x Posición x de renderizado en pantalla(px)
-     * @param y Posición y de renderizado en pantalla(px)
-     * @param width Ancho del boton(px)
-     * @param height Alto del boton(px)
-     */
+
+    // Radio de las esquinas redondeadas
+    private static final int ARC = 16;
+
     public MyButton(String text,int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.text = text;
-        this.id = -1; // no se usa en este constructor
-        
+        this.id = -1;
         initBounds();
     }
-    
-    /**
-     * Constructor para botones de la hotbar con ID de planta y sprite.
-     */
+
     public MyButton(String text, int id, BufferedImage sprite, int x, int y, int width, int height) {
         this(text, x, y, width, height);
         this.id = id;
         this.sprite = sprite;
-
         initBounds();
     }
 
@@ -55,75 +50,87 @@ public class MyButton {
     private void initBounds() {
         this.bounds = new Rectangle(x,y,width,height);
     }
-    
+
     public void draw(Graphics g){
-        // Cuerpo
-        drawBody(g);
-        // Borde
-        drawBorder(g);
-        
-        // Texto
-        drawText(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        drawShadow(g2);
+        drawBody(g2);
+        drawBorder(g2);
+        drawText(g2);
     }
-    
-    private void drawBody(Graphics g){
-        if(mouseOver){
-            g.setColor(Color.gray);
-        }else
-            g.setColor(Color.WHITE);
-        g.fillRect(x,y,width,height);
+
+    private void drawShadow(Graphics2D g2){
+        int offset = mousePressed ? 2 : 4; // la sombra "se achica" al presionar
+        g2.setColor(new Color(0, 0, 0, 60)); // negro semitransparente
+        g2.fill(new RoundRectangle2D.Float(x + 2, y + offset, width, height, ARC, ARC));
+    }
+
+    private void drawBody(Graphics2D g2){
+        RoundRectangle2D.Float shape = new RoundRectangle2D.Float(x, y, width, height, ARC, ARC);
+
+        Color top, bottom;
+        if (mousePressed) {
+            top = new Color(180, 180, 180);
+            bottom = new Color(150, 150, 150);
+        } else if (mouseOver) {
+            top = new Color(235, 235, 235);
+            bottom = new Color(200, 200, 200);
+        } else {
+            top = Color.WHITE;
+            bottom = new Color(220, 220, 220);
+        }
+
+        GradientPaint gradient = new GradientPaint(x, y, top, x, y + height, bottom);
+        g2.setPaint(gradient);
+        g2.fill(shape);
 
         if (sprite != null) {
-            // Centra el sprite en la mitad superior del botón; clamp para no salir del borde
             int sx = x + (width  - sprite.getWidth())  / 2;
             int sy = Math.max(y, y + (height / 2 - sprite.getHeight()) / 2);
-            g.drawImage(sprite, sx, sy, null);
+            // pequeño desplazamiento al presionar para dar efecto
+            if (mousePressed) sy += 1;
+            g2.drawImage(sprite, sx, sy, null);
         }
     }
 
-    private void drawText(Graphics g){
-        int w = g.getFontMetrics().stringWidth(text);
-        g.setColor(Color.BLACK);
-        // Si hay sprite, el texto va en la mitad inferior; si no, centrado
+    private void drawText(Graphics2D g2){
+        int w = g2.getFontMetrics().stringWidth(text);
+        g2.setColor(Color.BLACK);
         int textY = (sprite != null) ? y + height - 4 : y + height / 2;
-        g.drawString(text, x + width / 2 - w / 2, textY);
+        if (mousePressed) textY += 1;
+        g2.drawString(text, x + width / 2 - w / 2, textY);
     }
-    
-    private void drawBorder(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.drawRect(x,y,width,height);
-        if(mousePressed){
-            g.drawRect(x+1, y+1, width-2, height-2);
-            g.drawRect(x+2, y+2, width-4, height-4);
-        }
+
+    private void drawBorder(Graphics2D g2){
+        g2.setColor(mouseOver ? new Color(80, 80, 80) : new Color(50, 50, 50));
+        g2.setStroke(new java.awt.BasicStroke(mousePressed ? 2.5f : 1.5f));
+        g2.draw(new RoundRectangle2D.Float(x, y, width - 1, height - 1, ARC, ARC));
     }
-    
+
     public void setMouseOver(boolean mouseOver){
         this.mouseOver = mouseOver;
     }
-    
+
     public boolean isMouseOver(){
         return mouseOver;
     }
-    
+
     public void setMousePressed(boolean mousePressed){
         this.mousePressed = mousePressed;
     }
-    
+
     public boolean isMousePressed(){
         return mousePressed;
     }
-    
+
     public Rectangle getBounds(){
         return bounds;
     }
-    
+
     public void resetBooleans(){
         this.mouseOver = false;
         this.mousePressed = false;
     }
-
-    
-    
-    
 }
