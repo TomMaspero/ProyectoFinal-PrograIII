@@ -36,8 +36,6 @@ public class PlantaDAO {
         p.setNombre((String) row.get("nombre"));
         p.setCostoSol(((Number) row.get("costo_sol")).intValue());
         p.setDano(((Number) row.get("dano")).intValue());
-        Object va = row.get("velocidad_ataque");
-        p.setVelocidadAtaque(va != null ? ((Number) va).floatValue() : 0f);
         p.setRutaSprite((String) row.get("ruta_sprite"));
         return p;
     }

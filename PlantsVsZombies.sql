@@ -97,7 +97,6 @@ CREATE TABLE `plantas` (
   `nombre` varchar(50) NOT NULL,
   `costo_sol` int(11) NOT NULL,
   `dano` int(11) DEFAULT 0,
-  `velocidad_ataque` decimal(4,2) DEFAULT 0.00,
   `ruta_sprite` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -105,9 +104,9 @@ CREATE TABLE `plantas` (
 -- Dumping data for table `plantas`
 --
 
-INSERT INTO `plantas` (`plantaId`, `nombre`, `costo_sol`, `dano`, `velocidad_ataque`, `ruta_sprite`) VALUES
-(1, 'Peashooter', 100, 20, 1.50, 'peaAtlas.png'),
-(2, 'Sunflower', 50, 0, 0.00, 'sunflower.png');
+INSERT INTO `plantas` (`plantaId`, `nombre`, `costo_sol`, `dano`, `ruta_sprite`) VALUES
+(1, 'Peashooter', 100, 20, 'peaAtlas.png'),
+(2, 'Sunflower', 50, 0, 'sunflower.png');
 
 -- --------------------------------------------------------
 
