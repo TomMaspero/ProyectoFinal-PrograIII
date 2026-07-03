@@ -52,6 +52,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int passiveSunTimer = 0;
     private static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2;
 
+    // Puntos
+    private int puntos = 0; // Puntuacion total
+    private int plantasPerdidas = 0;
+    private int zombiesEliminados = 0;
+    private int zombiesEnLimite = 0;
+    
     // Vidas
     private int vidas = 5;
     private boolean derrota = false;
@@ -153,10 +159,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         checkPlantZombieCollisions();
-        enemyManager.removeDeadEnemies();
+        zombiesEliminados += enemyManager.removeDeadEnemies(); // Elimina muertos y los cuenta
+        puntos = zombiesEliminados * 10;
         // resto al contador de vidas la cantidad de enemigos que hayan llegado al final
-        vidas -= enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
-        
+        zombiesEnLimite = enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
+        vidas -= zombiesEnLimite;
+        zombiesEliminados += zombiesEnLimite;
         if (vidas <= 0) {
             vidas = 0;
             derrota = true;
@@ -170,12 +178,14 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
         
         floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
+        
+        Runtime.getRuntime().gc(); // test limpieza de memoria
     }
 
     private void updateSunGeneration() {
         for (int row = 0; row < GRID_ROWS; row++) {
             for (int col = 0; col < GRID_COLS; col++) {
-                if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 2) {
+                if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 2) { // Si hay un girasol colocado
                     sunTimers[row][col]++;
                     if (sunTimers[row][col] >= SUN_INTERVAL) {
                         sunTimers[row][col] = 0;
@@ -299,6 +309,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g.setColor(Color.YELLOW);
         g.setFont(new Font("Arial", Font.BOLD, 12));
         g.drawString(String.valueOf(sol), 578, 18);
+        
+        // Contador de puntos
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        g.drawString("Puntos: " + puntos, 550, 375);
 
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
@@ -387,22 +401,25 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     while (it.hasNext()) {
         Enemigo e = it.next();
         
-        // Which grid column is the zombie's left edge in?
+        // Con que columna del grid interactua el zombie
         int col = (int)((e.getX() - GRID_X) / CELL_WIDTH);
         
-        // Which grid row? Use the zombie's vertical center
+        // Con que fila interactua
         int row = (int)((e.getY() + 16 - GRID_Y) / CELL_HEIGHT);
-        // The +16 is half the zombie's collision height (32/2), 
-        // centering the check on the zombie's vertical middle
+        // +16 para centrarlo
         
         // Bounds check
         if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS)
             continue;
         
-        // Is there a plant in this cell?
+        // Si hay una planta en la celda, la elimina junto al zombie
         if (lvl[row][col] != 0) {
-            lvl[row][col] = 0;   // remove the plant from the grid
-            it.remove();          // remove the zombie
+            lvl[row][col] = 0;   // Sacar la planta
+            plantasPerdidas++;
+            it.remove();          // Sacar al zombie
+            zombiesEliminados++;
+            puntos += 5;// suma 5 puntos al chocar zombie con planta
+            System.out.println("Suma " + puntos + " puntos");
             }
         }
     }
