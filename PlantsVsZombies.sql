@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 03, 2026 at 06:15 PM
+-- Generation Time: Jul 03, 2026 at 10:02 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -71,6 +71,15 @@ CREATE TABLE `jugadores` (
   `fecha_registro` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `jugadores`
+--
+
+INSERT INTO `jugadores` (`jugadorId`, `nombre`, `fecha_registro`) VALUES
+(49, 'ASD', '2026-07-03 16:19:41'),
+(50, 'POO', '2026-07-03 16:28:20'),
+(51, 'PPP', '2026-07-03 16:55:25');
+
 -- --------------------------------------------------------
 
 --
@@ -85,6 +94,15 @@ CREATE TABLE `partidas` (
   `plantas_perdidas` int(11) DEFAULT 0,
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `partidas`
+--
+
+INSERT INTO `partidas` (`partidaId`, `jugadorId`, `oleadas_superadas`, `zombies_eliminados`, `plantas_perdidas`, `fecha`) VALUES
+(1, 49, 1, 2, 0, '2026-07-03 16:19:41'),
+(2, 50, 4, 170, 10, '2026-07-03 16:28:20'),
+(3, 51, 4, 184, 17, '2026-07-03 16:55:25');
 
 -- --------------------------------------------------------
 
@@ -106,7 +124,8 @@ CREATE TABLE `plantas` (
 
 INSERT INTO `plantas` (`plantaId`, `nombre`, `costo_sol`, `dano`, `ruta_sprite`) VALUES
 (1, 'Peashooter', 100, 20, 'peaAtlas.png'),
-(2, 'Sunflower', 50, 0, 'sunflower.png');
+(2, 'Sunflower', 50, 0, 'sunflower.png'),
+(3, 'Pala', 0, 0, 'pala.png');
 
 -- --------------------------------------------------------
 
@@ -120,6 +139,15 @@ CREATE TABLE `puntajes` (
   `puntuacion` int(11) NOT NULL,
   `fecha` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `puntajes`
+--
+
+INSERT INTO `puntajes` (`puntajeId`, `jugadorId`, `puntuacion`, `fecha`) VALUES
+(1, 49, 11, '2026-07-03 16:19:41'),
+(2, 50, 396, '2026-07-03 16:28:20'),
+(3, 51, 410, '2026-07-03 16:55:25');
 
 --
 -- Indexes for dumped tables
@@ -178,25 +206,25 @@ ALTER TABLE `enemigos`
 -- AUTO_INCREMENT for table `jugadores`
 --
 ALTER TABLE `jugadores`
-  MODIFY `jugadorId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `jugadorId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `partidas`
 --
 ALTER TABLE `partidas`
-  MODIFY `partidaId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `partidaId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `plantas`
 --
 ALTER TABLE `plantas`
-  MODIFY `plantaId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `plantaId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `puntajes`
 --
 ALTER TABLE `puntajes`
-  MODIFY `puntajeId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `puntajeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
