@@ -18,12 +18,14 @@ public class Hotbar {
     private MyButton bMenu;
     private ArrayList<MyButton> plantButtons = new ArrayList<>();
     private int selectedPlantaId = 0; // 0 = ninguna seleccionada
+    private List<Planta> plantas;
 
     public Hotbar(int x, int y, int width, int height, List<Planta> plantas, TileManager tileManager) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.plantas = plantas;
         initButtons(plantas, tileManager);
     }
 
@@ -69,6 +71,22 @@ public class Hotbar {
         bMenu.draw(g);
         for (MyButton b : plantButtons) {
             b.draw(g);
+        }
+
+        // Cost labels
+        g.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 9));
+        for (MyButton b : plantButtons) {
+            for (Planta p : plantas) {
+                if (p.getPlantaId() == b.getId()) {
+                    String cost = String.valueOf(p.getCostoSol());
+                    int cw = g.getFontMetrics().stringWidth(cost);
+                    g.setColor(new Color(80, 80, 80));
+                    g.drawString(cost,
+                        b.getBounds().x + (b.getBounds().width - cw) / 2,
+                        b.getBounds().y + b.getBounds().height + 10);
+                    break;
+                }
+            }
         }
     }
 

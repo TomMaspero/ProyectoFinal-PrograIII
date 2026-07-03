@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 import main.Juego;
 import managers.EnemyManager;
@@ -37,9 +38,32 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int[][] fireTimers;
     private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
 
+    // Sol 
+    private int sol = 200;
+    private int[][] sunTimers;
+    private static final int SUN_INTERVAL = 480; // 480 / 60 UPS = 8.0s
+    private List<Planta> plantas;
+    private BufferedImage solIcon;
+    private ArrayList<FloatingText> floatingTexts = new ArrayList<>();
+
+    private int passiveSunTimer = 0;
+    private static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2;
+
+    private static class FloatingText {
+        int x, y, ticksLeft, totalTicks;
+        String text;
+        Color color;
+        boolean down;
+        FloatingText(int x, int y, String text, Color color, int ticks, boolean down) {
+            this.x = x; this.y = y; this.text = text;
+            this.color = color; this.ticksLeft = ticks;
+            this.totalTicks = ticks; this.down = down;
+        }
+    }
+
     // Debug grid overlay
     private boolean showDebugGrid = false;
-    private static final Rectangle DEBUG_BTN = new Rectangle(565, 4, 70, 14);
+    private static final Rectangle DEBUG_BTN = new Rectangle(565, 344, 70, 14);
 
     // Constantes del grid — calibradas sobre yard_resize.png (640×360)
     // Área de pasto: x=112–454 (9×38px), y=42–342 (5×60px)
@@ -64,12 +88,14 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         lvl = EditorNivel.getLevelData();
         tileManager = new TileManager();
 
-        List<Planta> plantas = juego.getPlantaDAO().findAll();
+        plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
-        
+
         enemyManager = new EnemyManager(this);
         combatManager = new CombatManager(this);
         fireTimers = new int[GRID_ROWS][GRID_COLS];
+        sunTimers = new int[GRID_ROWS][GRID_COLS];
+        solIcon = CargaGuarda.getSpriteAtlas("Sol.png");
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
         //CargaGuarda.ReadFromFile();
@@ -102,9 +128,36 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     
     public void update(){
         updatePlantFiring();
+        updateSunGeneration();
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         enemyManager.removeDeadEnemies();
+        passiveSunTimer++;
+        if (passiveSunTimer >= PASSIVE_SUN_INTERVAL) {
+            passiveSunTimer = 0;
+            sol += 25;
+            floatingTexts.add(new FloatingText(555, 24, "+25", Color.YELLOW, 60, true));
+        }
+        floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
+    }
+
+    private void updateSunGeneration() {
+        for (int row = 0; row < GRID_ROWS; row++) {
+            for (int col = 0; col < GRID_COLS; col++) {
+                if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 2) {
+                    sunTimers[row][col]++;
+                    if (sunTimers[row][col] >= SUN_INTERVAL) {
+                        sunTimers[row][col] = 0;
+                        sol += 25;
+                        int tx = GRID_X + col * CELL_WIDTH;
+                        int ty = GRID_Y + row * CELL_HEIGHT;
+                        floatingTexts.add(new FloatingText(tx, ty, "+25", Color.YELLOW, 60, false));
+                    }
+                } else {
+                    sunTimers[row][col] = 0;
+                }
+            }
+        }
     }
 
     private boolean enemyInRow(int row) {
@@ -194,9 +247,32 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         
         combatManager.draw(g);
 
+        // Texto flotante de + 25
+        Font ftFont = new Font("Arial", Font.BOLD, 10);
+        g.setFont(ftFont);
+        for (FloatingText ft : floatingTexts) {
+            int elapsed = ft.totalTicks - ft.ticksLeft;
+            int drawY = ft.down ? ft.y + elapsed : ft.y - elapsed;
+            g.setColor(ft.color);
+            g.drawString(ft.text, ft.x, drawY);
+        }
+
+        // Contador de Sol
+        g.drawImage(solIcon, 555, 4, 20, 20, null);
+        g.setColor(Color.YELLOW);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        g.drawString(String.valueOf(sol), 578, 18);
+
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
         drawDebugToggle(g);
+    }
+
+    private int getCostoPlanta(int plantaId) {
+        for (Planta p : plantas) {
+            if (p.getPlantaId() == plantaId) return p.getCostoSol();
+        }
+        return 0;
     }
 
     public TileManager getTileManager() {
@@ -233,13 +309,22 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             if (EstadoJuego.estadoJuego == EstadoJuego.MENU)
                 MusicManager.playMenuTheme();
         } else {
-            int sel = hotbar.getSelectedPlantaId(); // Obtiene id de la planta desde el boton de la hotbar
+            int sel = hotbar.getSelectedPlantaId();
             if (sel != 0) {
                 int col = (x - GRID_X) / CELL_WIDTH;
                 int row = (y - GRID_Y) / CELL_HEIGHT;
                 if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
                         && lvl[row][col] == 0) {
-                    lvl[row][col] = sel;
+                    int costo = getCostoPlanta(sel);
+                    if (sol >= costo) {
+                        lvl[row][col] = sel;
+                        sol -= costo;
+                    } else {
+                        boolean yaHayError = floatingTexts.stream()
+                                .anyMatch(ft -> ft.color == Color.RED);
+                        if (!yaHayError)
+                            floatingTexts.add(new FloatingText(x - 40, y, "No hay suficiente Sol!", Color.RED, 90, false));
+                    }
                 }
             } else if (x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
                 enemyManager.agregaEnemigo(x, y);   
