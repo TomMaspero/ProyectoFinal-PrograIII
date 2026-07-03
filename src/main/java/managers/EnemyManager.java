@@ -46,8 +46,7 @@ public class EnemyManager {
     public void agregaEnemigo(int x, int y){
         TipoEnemigo tipo = elegirTipoAleatorio();
         enemigos.add(new Enemigo(x, y, tipo));
-        enemigos.add(new Enemigo(x, y, tipo));
-        // Se usa en Jugando -> mouseClicked para un test de spawneo                                        
+        // Se usa en Jugando -> mouseClicked para un test de spawneo
     }
     
     private TipoEnemigo elegirTipoAleatorio() {
