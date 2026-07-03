@@ -47,6 +47,31 @@ public class MusicManager {
             e.printStackTrace();
         }
     }
+    
+    public static void playSFX(String resource) {
+        if (resource.equals(currentResource) && currentClip != null && currentClip.isRunning())
+            return;
+
+        currentResource = resource;
+
+        try {
+            InputStream is = MusicManager.class.getClassLoader().getResourceAsStream(resource);
+            AudioInputStream mp3In = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
+            AudioFormat base = mp3In.getFormat();
+            AudioFormat pcm = new AudioFormat(
+                AudioFormat.Encoding.PCM_SIGNED,
+                base.getSampleRate(), 16,
+                base.getChannels(), base.getChannels() * 2,
+                base.getSampleRate(), false);
+            AudioInputStream pcmIn = AudioSystem.getAudioInputStream(pcm, mp3In);
+
+            currentClip = AudioSystem.getClip();
+            currentClip.open(pcmIn);
+            currentClip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void stop() {
         if (currentClip != null) {

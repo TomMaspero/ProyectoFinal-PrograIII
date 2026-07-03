@@ -21,6 +21,8 @@ public class CombatManager {
     }
 
     public void spawn(float x, float y, int fila) {
+        
+        MusicManager.playSFX("music/shoot.mp3");
         proyectiles.add(new Proyectil(x, y, fila));
     }
 
@@ -31,6 +33,7 @@ public class CombatManager {
                 for (Enemigo e : enemigos) {
                     if (e.getVida() > 0 && p.getColision().intersects(e.getColision())) { // Un zombie y un proyectil colisionan
                         e.setVida(e.getVida() - p.getDanio());
+                        MusicManager.playSFX("music/splat.mp3");
                         p.hit();
                         break;
                     }

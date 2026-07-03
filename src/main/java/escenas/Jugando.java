@@ -379,7 +379,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                 if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS
                         && lvl[row][col] == 0) {
                     int costo = getCostoPlanta(sel);
-                    if (sol >= costo) {
+                    if (sol >= costo) { // Si hay suficiente sol, se planta
+                        MusicManager.playSFX("music/tierra.mp3");
                         lvl[row][col] = sel;
                         sol -= costo;
                     } else {
