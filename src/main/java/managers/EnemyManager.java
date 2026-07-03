@@ -61,7 +61,7 @@ public class EnemyManager {
     }
     
     // retorna cuantos enemigos pasaron la linea
-    public int removeEnemiesPastLine(int posLineaX) {
+    public int removeEnemiesTrasPasarLimite(int posLineaX) {
         int cont = 0;
         Iterator<Enemigo> it = enemigos.iterator();
         while (it.hasNext()) {

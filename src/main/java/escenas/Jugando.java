@@ -281,6 +281,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             g.drawString(ft.text, ft.x, drawY);
         }
 
+        // Contador de vidas
+        for (int i = 0; i < 5; i++) {
+            BufferedImage corazon = (i < vidas) ? heartFull : heartEmpty;
+            g.drawImage(corazon, 20 + i * 18, 4, 16, 16, null);
+        }
+        
         // Contador de Sol
         g.drawImage(solIcon, 555, 4, 20, 20, null);
         g.setColor(Color.YELLOW);
