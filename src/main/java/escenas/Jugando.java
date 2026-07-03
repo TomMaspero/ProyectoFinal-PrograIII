@@ -2,8 +2,11 @@ package escenas;
 
 import IU.Hotbar;
 import entidades.Enemigo;
+import entidades.Jugador;
+import entidades.Partida;
 import entidades.Planta;
 import entidades.Proyectil;
+import entidades.Puntaje;
 import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
@@ -66,7 +69,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private boolean derrota = false;
     private BufferedImage heartFull, heartEmpty;
     
+    // puntaje
     private static final Font FONT_PUNTOS = new Font("Arial", Font.BOLD, 12);
+    private boolean pidiendoNombre = false;
+    private StringBuilder nombreIngresado = new StringBuilder();
+    private static final int NOMBRE_MAX_LEN = 3;
+    private static final Font FONT_NOMBRE = new Font("Consolas", Font.BOLD, 28);
     
     private static class FloatingText {
         int x, y, ticksLeft, totalTicks;
@@ -136,7 +144,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         solIcon = CargaGuarda.getSpriteAtlas("Sol.png");
         heartFull = CargaGuarda.getSpriteAtlas("heart_full.png");
         heartEmpty = CargaGuarda.getSpriteAtlas("heart_empty.png");
-        waveManager = new WaveManager(enemyManager, GRID_Y, CELL_HEIGHT, GRID_ROWS, 640);
+        waveManager = new WaveManager(this, enemyManager, GRID_Y, CELL_HEIGHT, GRID_ROWS, 640);
 
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
@@ -188,10 +196,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         // resto al contador de vidas la cantidad de enemigos que hayan llegado al final
         zombiesEnLimite = enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
         vidas -= zombiesEnLimite;
-        zombiesEliminados += zombiesEnLimite;
         if (vidas <= 0) {
             vidas = 0;
             derrota = true;
+            pidiendoNombre = true;
         }
         
         passiveSunTimer++;
@@ -202,8 +210,6 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
         
         floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
-        
-        Runtime.getRuntime().gc(); // test limpieza de memoria
     }
 
     private void updateSunGeneration() {
@@ -383,7 +389,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     @Override
     public void mouseReleased(int x, int y) {
         if (derrota) {
-            if (MENU_BTN_DERROTA.contains(x, y)) {
+            if (!pidiendoNombre && MENU_BTN_DERROTA.contains(x, y)) {
                 EstadoJuego.SetEstadoJuego(EstadoJuego.MENU);
                 MusicManager.playMenuTheme();
             }
@@ -445,7 +451,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                 plantasPerdidas++;
                 it.remove();          // Sacar al zombie
                 zombiesEliminados++;
-                puntos += 5;// suma 5 puntos al chocar zombie con planta
+                puntos += e.getPuntaje(); // puntaje real segun el tipo de zombie
             }
         }
     }
@@ -453,33 +459,92 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     // render que se muestra cuando se le acaban las vidas al jugador
     public void renderDerrota(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        
-        // overlay gris cubriendo la pantalla entera
+
         g2d.setComposite(ALPHA_OVERLAY);
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, 640, 460);
-
         g2d.setComposite(ALPHA_FULL);
 
-        // Texto de derrota
         g2d.setFont(FONT_DERROTA);
         String msg = "Derrota";
         int msgW = g2d.getFontMetrics().stringWidth(msg);
         g2d.setColor(Color.RED);
-        g2d.drawString(msg, 320 - msgW / 2, 180);
-        
-        // Boton menu
-        Rectangle menuBtn = new Rectangle(245, 210, 150, 35);
-        g2d.setColor(Color.DARK_GRAY);
-        g2d.fillRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
-        g2d.setColor(Color.WHITE);
-        g2d.drawRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
+        g2d.drawString(msg, 320 - msgW / 2, 150);
+
         g2d.setFont(FONT_MENU_BTN);
-        String btnText = "Volver al Menu";
-        int btnW = g2d.getFontMetrics().stringWidth(btnText);
-        g2d.drawString(btnText, menuBtn.x + (menuBtn.width - btnW) / 2, menuBtn.y + 23);
+        g2d.setColor(Color.WHITE);
+        String puntosMsg = "Puntos: " + puntos;
+        int pmW = g2d.getFontMetrics().stringWidth(puntosMsg);
+        g2d.drawString(puntosMsg, 320 - pmW / 2, 185);
+
+        if (pidiendoNombre) {
+            String prompt = "Ingresa tus iniciales:";
+            int prW = g2d.getFontMetrics().stringWidth(prompt);
+            g2d.drawString(prompt, 320 - prW / 2, 215);
+
+            StringBuilder display = new StringBuilder(nombreIngresado);
+            while (display.length() < NOMBRE_MAX_LEN) display.append('_');
+            g2d.setFont(FONT_NOMBRE);
+            g2d.setColor(Color.YELLOW);
+            String nombreStr = display.toString();
+            int nW = g2d.getFontMetrics().stringWidth(nombreStr);
+            g2d.drawString(nombreStr, 320 - nW / 2, 260);
+        } 
+        else {
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.fillRect(MENU_BTN_DERROTA.x, MENU_BTN_DERROTA.y, MENU_BTN_DERROTA.width, MENU_BTN_DERROTA.height);
+            g2d.setColor(Color.WHITE);
+            g2d.drawRect(MENU_BTN_DERROTA.x, MENU_BTN_DERROTA.y, MENU_BTN_DERROTA.width, MENU_BTN_DERROTA.height);
+            String btnText = "Volver al Menu";
+            int btnW = g2d.getFontMetrics().stringWidth(btnText);
+            g2d.drawString(btnText, MENU_BTN_DERROTA.x + (MENU_BTN_DERROTA.width - btnW) / 2, MENU_BTN_DERROTA.y + 23);
+        }
     }
     
+    @Override
+    public void keyTyped(char c) {
+        if (!pidiendoNombre) return;
+        
+        if (Character.isLetterOrDigit(c) && nombreIngresado.length() < NOMBRE_MAX_LEN) {
+            nombreIngresado.append(Character.toUpperCase(c));
+        }
+        
+        if (nombreIngresado.length() == NOMBRE_MAX_LEN) {
+            confirmarNombre();
+        }
+    }
+
+    private void confirmarNombre() {
+        pidiendoNombre = false;
+        guardarPartida(nombreIngresado.toString());
+    }
+    
+    private void guardarPartida(String nombre) {
+        Jugador jugador = getJuego().getJugadorDAO().findByNombre(nombre);
+        int jugadorId;
+        if (jugador != null) {
+            jugadorId = jugador.getJugadorId();
+        } else {
+            jugadorId = getJuego().getJugadorDAO().save(new Jugador(nombre));
+        }
+
+        Partida partida = new Partida(jugadorId);
+        partida.setOleadasSuperadas(waveManager.getOleadaActual());
+        partida.setZombiesEliminados(zombiesEliminados);
+        partida.setPlantasPerdidas(plantasPerdidas);
+        getJuego().getPartidaDAO().save(partida);
+
+        getJuego().getPuntajeDAO().save(new Puntaje(jugadorId, puntos));
+    }
+
+    public int getPuntos() {
+        return puntos;
+    }
+
+    public boolean isPidiendoNombre() {
+        return pidiendoNombre;
+    }
+
     // ── Debug helpers ────────────────────────────────────────────────────────
 
     private void drawDebugToggle(Graphics g) {
