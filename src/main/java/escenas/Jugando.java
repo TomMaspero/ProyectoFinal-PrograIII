@@ -1,9 +1,13 @@
 package escenas;
 
 import IU.Hotbar;
+import config.GameConfig;
 import entidades.Enemigo;
+import entidades.Jugador;
+import entidades.Partida;
 import entidades.Planta;
 import entidades.Proyectil;
+import entidades.Puntaje;
 import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
@@ -41,30 +45,34 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private int mouseX, mouseY;
 
     private int[][] fireTimers;
-    private static final int FIRE_INTERVAL = 72; // cantidad de ticks del juego
     private final boolean[] rowHasEnemy = new boolean[GRID_ROWS]; // reusado cada tick, evita reescanear
 
-    // Sol 
-    private int sol = 200;
+    // Sol
+    private int sol = GameConfig.SOL_INICIAL;
     private int[][] sunTimers;
-    private static final int SUN_INTERVAL = 480; // 480 / 60 UPS = 8.0s
     private List<Planta> plantas;
     private BufferedImage solIcon;
     private ArrayList<FloatingText> floatingTexts = new ArrayList<>();
 
     private int passiveSunTimer = 0;
-    private static final int PASSIVE_SUN_INTERVAL = SUN_INTERVAL * 2;
 
     // Puntos
     private int puntos = 0; // Puntuacion total
     private int plantasPerdidas = 0;
     private int zombiesEliminados = 0;
     private int zombiesEnLimite = 0;
-    
+
     // Vidas
-    private int vidas = 5;
+    private int vidas = GameConfig.VIDAS_INICIALES;
     private boolean derrota = false;
     private BufferedImage heartFull, heartEmpty;
+    
+    // puntaje
+    private static final Font FONT_PUNTOS = new Font("Arial", Font.BOLD, 12);
+    private boolean pidiendoNombre = false;
+    private StringBuilder nombreIngresado = new StringBuilder();
+    private static final int NOMBRE_MAX_LEN = 3;
+    private static final Font FONT_NOMBRE = new Font("Consolas", Font.BOLD, 28);
     
     private static class FloatingText {
         int x, y, ticksLeft, totalTicks;
@@ -134,7 +142,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         solIcon = CargaGuarda.getSpriteAtlas("Sol.png");
         heartFull = CargaGuarda.getSpriteAtlas("heart_full.png");
         heartEmpty = CargaGuarda.getSpriteAtlas("heart_empty.png");
-        waveManager = new WaveManager(enemyManager, GRID_Y, CELL_HEIGHT, GRID_ROWS, 640);
+        waveManager = new WaveManager(this, enemyManager, GRID_Y, CELL_HEIGHT, GRID_ROWS, 640);
 
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
@@ -176,27 +184,30 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         checkPlantZombieCollisions();
-        zombiesEliminados += enemyManager.removeDeadEnemies(); // Elimina muertos y los cuenta
-        puntos = zombiesEliminados * 10;
+        
+        // suma el puntaje antes de remover los enemigos
+        puntos += enemyManager.calcularPuntajeMuertes();
+        
+        // Elimina muertos y los cuenta
+        zombiesEliminados += enemyManager.removeDeadEnemies(); 
+        
         // resto al contador de vidas la cantidad de enemigos que hayan llegado al final
         zombiesEnLimite = enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
         vidas -= zombiesEnLimite;
-        zombiesEliminados += zombiesEnLimite;
         if (vidas <= 0) {
             vidas = 0;
             derrota = true;
+            pidiendoNombre = true;
         }
         
         passiveSunTimer++;
-        if (passiveSunTimer >= PASSIVE_SUN_INTERVAL) {
+        if (passiveSunTimer >= GameConfig.PASSIVE_SUN_INTERVAL) {
             passiveSunTimer = 0;
-            sol += 25;
+            sol += GameConfig.SOL_POR_GENERACION;
             floatingTexts.add(new FloatingText(555, 24, "+25", Color.YELLOW, 60, true));
         }
         
         floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
-        
-        Runtime.getRuntime().gc(); // test limpieza de memoria
     }
 
     private void updateSunGeneration() {
@@ -204,9 +215,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             for (int col = 0; col < GRID_COLS; col++) {
                 if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 2) { // Si hay un girasol colocado
                     sunTimers[row][col]++;
-                    if (sunTimers[row][col] >= SUN_INTERVAL) {
+                    if (sunTimers[row][col] >= GameConfig.SUN_INTERVAL) {
                         sunTimers[row][col] = 0;
-                        sol += 25;
+                        sol += GameConfig.SOL_POR_GENERACION;
                         int tx = GRID_X + col * CELL_WIDTH;
                         int ty = GRID_Y + row * CELL_HEIGHT;
                         floatingTexts.add(new FloatingText(tx, ty, "+25", Color.YELLOW, 60, false));
@@ -237,7 +248,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
             for (int col = 0; col < GRID_COLS; col++) {
                 if (row < lvl.length && col < lvl[row].length && lvl[row][col] == 1 && hasEnemy) {
                     fireTimers[row][col]++;
-                    if (fireTimers[row][col] >= FIRE_INTERVAL) {
+                    if (fireTimers[row][col] >= GameConfig.FIRE_INTERVAL) {
                         fireTimers[row][col] = 0;
                         float spawnX = GRID_X + col * CELL_WIDTH + CELL_WIDTH;
                         float spawnY = GRID_Y + row * CELL_HEIGHT + CELL_HEIGHT / 2 - 8;
@@ -317,7 +328,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
 
         // Contador de vidas
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < GameConfig.VIDAS_INICIALES; i++) {
             BufferedImage corazon = (i < vidas) ? heartFull : heartEmpty;
             g.drawImage(corazon, 20 + i * 18, 4, 16, 16, null);
         }
@@ -327,10 +338,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g.setColor(Color.YELLOW);
         g.setFont(FONT_SOL);
         g.drawString(String.valueOf(sol), 578, 18);
-        
+
         // Contador de puntos
-        g.setFont(new Font("Arial", Font.BOLD, 12));
-        g.drawString("Puntos: " + puntos, 550, 375);
+        g.setFont(FONT_PUNTOS);
+        g.setColor(Color.WHITE);
+        String textoPuntos = "Puntos: " + puntos;
+        g.drawString(textoPuntos, 550, 375);
 
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
@@ -374,7 +387,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     @Override
     public void mouseReleased(int x, int y) {
         if (derrota) {
-            if (MENU_BTN_DERROTA.contains(x, y)) {
+            if (!pidiendoNombre && MENU_BTN_DERROTA.contains(x, y)) {
                 EstadoJuego.SetEstadoJuego(EstadoJuego.MENU);
                 MusicManager.playMenuTheme();
             }
@@ -415,29 +428,28 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     }
     
     private void checkPlantZombieCollisions() {
-    Iterator<Enemigo> it = enemyManager.getEnemigos().iterator();
-    while (it.hasNext()) {
-        Enemigo e = it.next();
-        
-        // Con que columna del grid interactua el zombie
-        int col = (int)((e.getX() - GRID_X) / CELL_WIDTH);
-        
-        // Con que fila interactua
-        int row = (int)((e.getY() + 16 - GRID_Y) / CELL_HEIGHT);
-        // +16 para centrarlo
-        
-        // Bounds check
-        if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS)
-            continue;
-        
-        // Si hay una planta en la celda, la elimina junto al zombie
-        if (lvl[row][col] != 0) {
-            lvl[row][col] = 0;   // Sacar la planta
-            plantasPerdidas++;
-            it.remove();          // Sacar al zombie
-            zombiesEliminados++;
-            puntos += 5;// suma 5 puntos al chocar zombie con planta
-            System.out.println("Suma " + puntos + " puntos");
+        Iterator<Enemigo> it = enemyManager.getEnemigos().iterator();
+        while (it.hasNext()) {
+            Enemigo e = it.next();
+
+            // Con que columna del grid interactua el zombie
+            int col = (int)((e.getX() - GRID_X) / CELL_WIDTH);
+
+            // Con que fila interactua
+            int row = (int)((e.getY() + 16 - GRID_Y) / CELL_HEIGHT);
+            // +16 para centrarlo
+
+            // Bounds check
+            if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS)
+                continue;
+
+            // Si hay una planta en la celda, la elimina junto al zombie
+            if (lvl[row][col] != 0) {
+                lvl[row][col] = 0;   // Sacar la planta
+                plantasPerdidas++;
+                it.remove();          // Sacar al zombie
+                zombiesEliminados++;
+                puntos += e.getPuntaje(); // puntaje real segun el tipo de zombie
             }
         }
     }
@@ -445,33 +457,92 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     // render que se muestra cuando se le acaban las vidas al jugador
     public void renderDerrota(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        
-        // overlay gris cubriendo la pantalla entera
+
         g2d.setComposite(ALPHA_OVERLAY);
         g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, 640, 460);
-
         g2d.setComposite(ALPHA_FULL);
 
-        // Texto de derrota
         g2d.setFont(FONT_DERROTA);
         String msg = "Derrota";
         int msgW = g2d.getFontMetrics().stringWidth(msg);
         g2d.setColor(Color.RED);
-        g2d.drawString(msg, 320 - msgW / 2, 180);
-        
-        // Boton menu
-        Rectangle menuBtn = new Rectangle(245, 210, 150, 35);
-        g2d.setColor(Color.DARK_GRAY);
-        g2d.fillRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
-        g2d.setColor(Color.WHITE);
-        g2d.drawRect(menuBtn.x, menuBtn.y, menuBtn.width, menuBtn.height);
+        g2d.drawString(msg, 320 - msgW / 2, 150);
+
         g2d.setFont(FONT_MENU_BTN);
-        String btnText = "Volver al Menu";
-        int btnW = g2d.getFontMetrics().stringWidth(btnText);
-        g2d.drawString(btnText, menuBtn.x + (menuBtn.width - btnW) / 2, menuBtn.y + 23);
+        g2d.setColor(Color.WHITE);
+        String puntosMsg = "Puntos: " + puntos;
+        int pmW = g2d.getFontMetrics().stringWidth(puntosMsg);
+        g2d.drawString(puntosMsg, 320 - pmW / 2, 185);
+
+        if (pidiendoNombre) {
+            String prompt = "Ingresa tus iniciales:";
+            int prW = g2d.getFontMetrics().stringWidth(prompt);
+            g2d.drawString(prompt, 320 - prW / 2, 215);
+
+            StringBuilder display = new StringBuilder(nombreIngresado);
+            while (display.length() < NOMBRE_MAX_LEN) display.append('_');
+            g2d.setFont(FONT_NOMBRE);
+            g2d.setColor(Color.YELLOW);
+            String nombreStr = display.toString();
+            int nW = g2d.getFontMetrics().stringWidth(nombreStr);
+            g2d.drawString(nombreStr, 320 - nW / 2, 260);
+        } 
+        else {
+            g2d.setColor(Color.DARK_GRAY);
+            g2d.fillRect(MENU_BTN_DERROTA.x, MENU_BTN_DERROTA.y, MENU_BTN_DERROTA.width, MENU_BTN_DERROTA.height);
+            g2d.setColor(Color.WHITE);
+            g2d.drawRect(MENU_BTN_DERROTA.x, MENU_BTN_DERROTA.y, MENU_BTN_DERROTA.width, MENU_BTN_DERROTA.height);
+            String btnText = "Volver al Menu";
+            int btnW = g2d.getFontMetrics().stringWidth(btnText);
+            g2d.drawString(btnText, MENU_BTN_DERROTA.x + (MENU_BTN_DERROTA.width - btnW) / 2, MENU_BTN_DERROTA.y + 23);
+        }
     }
     
+    @Override
+    public void keyTyped(char c) {
+        if (!pidiendoNombre) return;
+        
+        if (Character.isLetterOrDigit(c) && nombreIngresado.length() < NOMBRE_MAX_LEN) {
+            nombreIngresado.append(Character.toUpperCase(c));
+        }
+        
+        if (nombreIngresado.length() == NOMBRE_MAX_LEN) {
+            confirmarNombre();
+        }
+    }
+
+    private void confirmarNombre() {
+        pidiendoNombre = false;
+        guardarPartida(nombreIngresado.toString());
+    }
+    
+    private void guardarPartida(String nombre) {
+        Jugador jugador = getJuego().getJugadorDAO().findByNombre(nombre);
+        int jugadorId;
+        if (jugador != null) {
+            jugadorId = jugador.getJugadorId();
+        } else {
+            jugadorId = getJuego().getJugadorDAO().save(new Jugador(nombre));
+        }
+
+        Partida partida = new Partida(jugadorId);
+        partida.setOleadasSuperadas(waveManager.getOleadaActual());
+        partida.setZombiesEliminados(zombiesEliminados);
+        partida.setPlantasPerdidas(plantasPerdidas);
+        getJuego().getPartidaDAO().save(partida);
+
+        getJuego().getPuntajeDAO().save(new Puntaje(jugadorId, puntos));
+    }
+
+    public int getPuntos() {
+        return puntos;
+    }
+
+    public boolean isPidiendoNombre() {
+        return pidiendoNombre;
+    }
+
     // ── Debug helpers ────────────────────────────────────────────────────────
 
     private void drawDebugToggle(Graphics g) {

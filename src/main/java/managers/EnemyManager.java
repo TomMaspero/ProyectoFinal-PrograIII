@@ -4,6 +4,7 @@
  */
 package managers;
 
+import config.GameConfig;
 import helpers.CargaGuarda;
 import escenas.Jugando;
 import entidades.Enemigo;
@@ -86,7 +87,7 @@ public class EnemyManager {
     
     public void update(){
         for(Enemigo e : enemigos)
-            e.mover(-0.2f, 0);
+            e.mover(GameConfig.ZOMBIE_VELOCIDAD, 0);
     }
     
     public void draw(Graphics g){
@@ -122,5 +123,16 @@ public class EnemyManager {
         }
         
         return cont;
+    }
+    
+    public int calcularPuntajeMuertes() {
+        int total = 0;
+        for (Enemigo e : enemigos) {
+            if (e.getVida() <= 0) {
+                total += e.getPuntaje();
+            }
+        }
+        
+        return total;
     }
 }
