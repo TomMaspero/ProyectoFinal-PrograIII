@@ -4,9 +4,14 @@
  */
 package main;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import static java.awt.SystemColor.menu;
 
 /**
  * Se encarga del renderizado principal del juego.

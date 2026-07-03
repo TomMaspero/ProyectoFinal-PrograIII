@@ -154,6 +154,10 @@ public class Juego extends JFrame implements Runnable{
         return jugando;
     }
 
+    public void resetJugando() {
+        jugando = new Jugando(this);
+    }
+
     public Ajustes getAjustes() {
         return ajustes;
     }
