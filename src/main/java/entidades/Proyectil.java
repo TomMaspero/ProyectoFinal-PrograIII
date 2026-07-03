@@ -16,8 +16,10 @@ public class Proyectil extends Entidad {
     public void update() {
         if (splatting) {
             splatTicks++;
-            if (splatTicks >= 8)
+            if (splatTicks >= 5){
+                System.out.println("suma tick");
                 activo = false;
+            }
             return;
         }
         if (getX() > 640)
