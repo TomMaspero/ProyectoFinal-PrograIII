@@ -17,7 +17,6 @@ public class Proyectil extends Entidad {
         if (splatting) {
             splatTicks++;
             if (splatTicks >= 5){
-                System.out.println("suma tick");
                 activo = false;
             }
             return;
