@@ -17,7 +17,7 @@ import managers.TileManager;
  */
 public class Juego extends JFrame implements Runnable{
     private Pantalla pantallaJuego;
-    private final double FPS_SET = 60.0;
+    private final double FPS_SET = 30.0;
     private final double UPS_SET = 60.0;
     private final DBConnect dbConnect;
     private final DBManager dbManager;
@@ -106,12 +106,23 @@ public class Juego extends JFrame implements Runnable{
             // Estadisticas
             
             if (System.currentTimeMillis() - lastTimeCheck >= 1000) {
-                System.out.println("FPS: " + frames + "UPS: " + updates);
+                System.out.println("FPS: " + frames + " UPS: " + updates);
                 frames = 0;
                 updates = 0;
                 lastTimeCheck = System.currentTimeMillis();
             }
-            
+
+            long sleepNanos = (long) Math.min(timePerFrame - (now - lastFrame),
+                                              timePerUpdate - (now - lastUpdate));
+            if (sleepNanos > 1_000_000) {
+                try {
+                    Thread.sleep(sleepNanos / 1_000_000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            } else {
+                Thread.yield();
+            }
         }
     }
     
