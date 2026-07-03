@@ -3,6 +3,7 @@ package escenas;
 import IU.Hotbar;
 import entidades.Enemigo;
 import entidades.Planta;
+import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
 import java.awt.AlphaComposite;
@@ -118,7 +119,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
-        enemyManager = new EnemyManager(this);
+        List<TipoEnemigo> tiposEnemigos = juego.getEnemigoDAO().findAll();
+        enemyManager = new EnemyManager(this, tiposEnemigos);
         combatManager = new CombatManager(this);
         fireTimers = new int[GRID_ROWS][GRID_COLS];
         sunTimers = new int[GRID_ROWS][GRID_COLS];
