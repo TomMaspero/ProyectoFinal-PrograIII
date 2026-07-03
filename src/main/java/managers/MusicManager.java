@@ -7,6 +7,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineEvent;
 
 public class MusicManager {
 
@@ -48,12 +49,13 @@ public class MusicManager {
         }
     }
     
+    /**
+     * Reproduce un efecto de sonido corto y descartable, sin interferir con la
+     * musica de fondo (no toca currentClip/currentResource, que son exclusivos
+     * de play()/stop()). Cada llamada usa su propio Clip, cerrado automaticamente
+     * al terminar de sonar.
+     */
     public static void playSFX(String resource) {
-        if (resource.equals(currentResource) && currentClip != null && currentClip.isRunning())
-            return;
-
-        currentResource = resource;
-
         try {
             InputStream is = MusicManager.class.getClassLoader().getResourceAsStream(resource);
             AudioInputStream mp3In = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
@@ -65,9 +67,14 @@ public class MusicManager {
                 base.getSampleRate(), false);
             AudioInputStream pcmIn = AudioSystem.getAudioInputStream(pcm, mp3In);
 
-            currentClip = AudioSystem.getClip();
-            currentClip.open(pcmIn);
-            currentClip.start();
+            Clip sfxClip = AudioSystem.getClip();
+            sfxClip.open(pcmIn);
+            sfxClip.addLineListener(evento -> {
+                if (evento.getType() == LineEvent.Type.STOP) {
+                    sfxClip.close();
+                }
+            });
+            sfxClip.start();
         } catch (Exception e) {
             e.printStackTrace();
         }

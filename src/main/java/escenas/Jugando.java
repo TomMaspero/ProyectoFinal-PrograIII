@@ -8,7 +8,6 @@ import entidades.Enemigo;
 import entidades.Jugador;
 import entidades.Partida;
 import entidades.Planta;
-import entidades.Puntaje;
 import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
@@ -179,7 +178,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     
     public void update(){
         if (derrota) {
-        //    return; // retornar si el juego termina
+            return; // retornar si el juego termina
         }
         updatePlantFiring();
         updateSunGeneration();
@@ -504,9 +503,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         partida.setOleadasSuperadas(waveManager.getOleadaActual());
         partida.setZombiesEliminados(zombiesEliminados);
         partida.setPlantasPerdidas(plantasPerdidas);
+        partida.setPuntuacion(puntos);
         getJuego().getPartidaDAO().save(partida);
-
-        getJuego().getPuntajeDAO().save(new Puntaje(jugadorId, puntos));
     }
 
     public int getPuntos() {

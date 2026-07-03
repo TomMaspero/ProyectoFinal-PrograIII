@@ -31,10 +31,11 @@ public class Pantalla extends JPanel {
     
     public Pantalla(Juego juego){
         this.juego = juego;
-        
+
         setPanelSize();
+        setLayout(null); // permite posicionar componentes Swing reales (ej. JTable) con setBounds()
     }
-    
+
     private void setPanelSize(){
         size = new Dimension(1280,920);
         setMinimumSize(size);

@@ -28,19 +28,23 @@ public class Render {
      * 
      */
     public void render(Graphics g){
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g2d.scale(2.0, 2.0);
-        switch(EstadoJuego.estadoJuego){
-            case MENU:
-                juego.getMenu().render(g2d);
-                break;
-            case AJUSTES:
-                juego.getAjustes().render(g2d);
-                break;
-            case JUGANDO:
-                juego.getJugando().render(g2d);
-                break;
+        Graphics2D g2d = (Graphics2D) g.create();
+        try {
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            g2d.scale(2.0, 2.0);
+            switch(EstadoJuego.estadoJuego){
+                case MENU:
+                    juego.getMenu().render(g2d);
+                    break;
+                case AJUSTES:
+                    juego.getAjustes().render(g2d);
+                    break;
+                case JUGANDO:
+                    juego.getJugando().render(g2d);
+                    break;
+            }
+        } finally {
+            g2d.dispose();
         }
     }
 }
