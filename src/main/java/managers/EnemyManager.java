@@ -123,4 +123,15 @@ public class EnemyManager {
         
         return cont;
     }
+    
+    public int calcularPuntajeMuertes() {
+        int total = 0;
+        for (Enemigo e : enemigos) {
+            if (e.getVida() <= 0) {
+                total += e.getPuntaje();
+            }
+        }
+        
+        return total;
+    }
 }

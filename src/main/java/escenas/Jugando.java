@@ -66,6 +66,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private boolean derrota = false;
     private BufferedImage heartFull, heartEmpty;
     
+    private static final Font FONT_PUNTOS = new Font("Arial", Font.BOLD, 12);
+    
     private static class FloatingText {
         int x, y, ticksLeft, totalTicks;
         String text;
@@ -176,8 +178,13 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         combatManager.update(enemyManager.getEnemigos());
         enemyManager.update();
         checkPlantZombieCollisions();
-        zombiesEliminados += enemyManager.removeDeadEnemies(); // Elimina muertos y los cuenta
-        puntos = zombiesEliminados * 10;
+        
+        // suma el puntaje antes de remover los enemigos
+        puntos += enemyManager.calcularPuntajeMuertes();
+        
+        // Elimina muertos y los cuenta
+        zombiesEliminados += enemyManager.removeDeadEnemies(); 
+        
         // resto al contador de vidas la cantidad de enemigos que hayan llegado al final
         zombiesEnLimite = enemyManager.removeEnemiesTrasPasarLimite(DEATH_LINE_X);
         vidas -= zombiesEnLimite;
@@ -327,10 +334,12 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g.setColor(Color.YELLOW);
         g.setFont(FONT_SOL);
         g.drawString(String.valueOf(sol), 578, 18);
-        
+
         // Contador de puntos
-        g.setFont(new Font("Arial", Font.BOLD, 12));
-        g.drawString("Puntos: " + puntos, 550, 375);
+        g.setFont(FONT_PUNTOS);
+        g.setColor(Color.WHITE);
+        String textoPuntos = "Puntos: " + puntos;
+        g.drawString(textoPuntos, 550, 375);
 
         // Debug overlay (siempre encima de todo)
         if (showDebugGrid) drawDebugGrid(g);
@@ -415,29 +424,28 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     }
     
     private void checkPlantZombieCollisions() {
-    Iterator<Enemigo> it = enemyManager.getEnemigos().iterator();
-    while (it.hasNext()) {
-        Enemigo e = it.next();
-        
-        // Con que columna del grid interactua el zombie
-        int col = (int)((e.getX() - GRID_X) / CELL_WIDTH);
-        
-        // Con que fila interactua
-        int row = (int)((e.getY() + 16 - GRID_Y) / CELL_HEIGHT);
-        // +16 para centrarlo
-        
-        // Bounds check
-        if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS)
-            continue;
-        
-        // Si hay una planta en la celda, la elimina junto al zombie
-        if (lvl[row][col] != 0) {
-            lvl[row][col] = 0;   // Sacar la planta
-            plantasPerdidas++;
-            it.remove();          // Sacar al zombie
-            zombiesEliminados++;
-            puntos += 5;// suma 5 puntos al chocar zombie con planta
-            System.out.println("Suma " + puntos + " puntos");
+        Iterator<Enemigo> it = enemyManager.getEnemigos().iterator();
+        while (it.hasNext()) {
+            Enemigo e = it.next();
+
+            // Con que columna del grid interactua el zombie
+            int col = (int)((e.getX() - GRID_X) / CELL_WIDTH);
+
+            // Con que fila interactua
+            int row = (int)((e.getY() + 16 - GRID_Y) / CELL_HEIGHT);
+            // +16 para centrarlo
+
+            // Bounds check
+            if (col < 0 || col >= GRID_COLS || row < 0 || row >= GRID_ROWS)
+                continue;
+
+            // Si hay una planta en la celda, la elimina junto al zombie
+            if (lvl[row][col] != 0) {
+                lvl[row][col] = 0;   // Sacar la planta
+                plantasPerdidas++;
+                it.remove();          // Sacar al zombie
+                zombiesEliminados++;
+                puntos += 5;// suma 5 puntos al chocar zombie con planta
             }
         }
     }
