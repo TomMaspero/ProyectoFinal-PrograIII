@@ -3,6 +3,8 @@ package escenas;
 import IU.Hotbar;
 import entidades.Enemigo;
 import entidades.Planta;
+import entidades.Proyectil;
+import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
 import java.awt.AlphaComposite;
@@ -118,7 +120,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
 
         plantas = juego.getPlantaDAO().findAll();
         hotbar = new Hotbar(0, 360, 640, 100, plantas, tileManager);
-        enemyManager = new EnemyManager(this);
+        List<TipoEnemigo> tiposEnemigos = juego.getEnemigoDAO().findAll();
+        enemyManager = new EnemyManager(this, tiposEnemigos);
         combatManager = new CombatManager(this);
         fireTimers = new int[GRID_ROWS][GRID_COLS];
         sunTimers = new int[GRID_ROWS][GRID_COLS];
@@ -509,5 +512,18 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g2d.setComposite(ALPHA_FULL);
         g2d.setColor(Color.BLUE);
         g2d.drawLine(DEATH_LINE_X, GRID_Y, DEATH_LINE_X, GRID_BOTTOM);
+
+        // Cajas de colision de enemigos y proyectiles
+        g2d.setColor(Color.GREEN);
+        for (Enemigo e : enemyManager.getEnemigos()) {
+            Rectangle c = e.getColision();
+            g2d.drawRect(c.x, c.y, c.width, c.height);
+        }
+
+        g2d.setColor(Color.MAGENTA);
+        for (Proyectil p : combatManager.getProyectiles()) {
+            Rectangle c = p.getColision();
+            g2d.drawRect(c.x, c.y, c.width, c.height);
+        }
     }
 }

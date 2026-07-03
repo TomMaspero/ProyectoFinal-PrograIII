@@ -24,6 +24,10 @@ public class CombatManager {
         proyectiles.add(new Proyectil(x, y, fila));
     }
 
+    public ArrayList<Proyectil> getProyectiles() {
+        return proyectiles;
+    }
+
     public void update(ArrayList<Enemigo> enemigos) {
         for (Proyectil p : proyectiles) {
             p.update();
