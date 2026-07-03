@@ -3,6 +3,7 @@ package escenas;
 import IU.Hotbar;
 import entidades.Enemigo;
 import entidades.Planta;
+import entidades.Proyectil;
 import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
 import helpers.EditorNivel;
@@ -511,5 +512,18 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         g2d.setComposite(ALPHA_FULL);
         g2d.setColor(Color.BLUE);
         g2d.drawLine(DEATH_LINE_X, GRID_Y, DEATH_LINE_X, GRID_BOTTOM);
+
+        // Cajas de colision de enemigos y proyectiles
+        g2d.setColor(Color.GREEN);
+        for (Enemigo e : enemyManager.getEnemigos()) {
+            Rectangle c = e.getColision();
+            g2d.drawRect(c.x, c.y, c.width, c.height);
+        }
+
+        g2d.setColor(Color.MAGENTA);
+        for (Proyectil p : combatManager.getProyectiles()) {
+            Rectangle c = p.getColision();
+            g2d.drawRect(c.x, c.y, c.width, c.height);
+        }
     }
 }
