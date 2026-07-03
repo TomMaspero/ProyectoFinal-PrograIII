@@ -1,12 +1,13 @@
 package escenas;
 
+import IU.DebugOverlay;
 import IU.Hotbar;
+import IU.PantallaDerrota;
 import config.GameConfig;
 import entidades.Enemigo;
 import entidades.Jugador;
 import entidades.Partida;
 import entidades.Planta;
-import entidades.Proyectil;
 import entidades.Puntaje;
 import entidades.TipoEnemigo;
 import helpers.CargaGuarda;
@@ -16,7 +17,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,6 +42,8 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     private EnemyManager enemyManager;
     private CombatManager combatManager;
     private WaveManager waveManager;
+    private PantallaDerrota pantallaDerrota;
+    private DebugOverlay debugOverlay;
     private int mouseX, mouseY;
 
     private int[][] fireTimers;
@@ -76,11 +78,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     
     // puntaje
     private static final Font FONT_PUNTOS = new Font("Arial", Font.BOLD, 12);
-    private boolean pidiendoNombre = false;
-    private StringBuilder nombreIngresado = new StringBuilder();
-    private static final int NOMBRE_MAX_LEN = 3;
-    private static final Font FONT_NOMBRE = new Font("Consolas", Font.BOLD, 28);
-    
+
     private static class FloatingText {
         int x, y, ticksLeft, totalTicks;
         String text;
@@ -96,22 +94,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     // Fonts reutilizados (evita crear objetos nuevos cada frame)
     private static final Font FONT_FT       = new Font("Arial", Font.BOLD, 10);
     private static final Font FONT_SOL      = new Font("Arial", Font.BOLD, 12);
-    private static final Font FONT_DEBUG_BTN = new Font("Arial", Font.PLAIN, 9);
-    private static final Font FONT_DEBUG_GRID = new Font("Arial", Font.BOLD, 7);
-    private static final Font FONT_DERROTA  = new Font("Arial", Font.BOLD, 40);
-    private static final Font FONT_MENU_BTN = new Font("Arial", Font.BOLD, 14);
 
     private static final AlphaComposite ALPHA_GHOST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.55f);
     private static final AlphaComposite ALPHA_FULL  = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f);
-    private static final AlphaComposite ALPHA_OVERLAY = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f);
-    private static final AlphaComposite ALPHA_DEBUG = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.18f);
-
-    // Debug grid overlay
-    private boolean showDebugGrid = false;
-    private static final Rectangle DEBUG_BTN = new Rectangle(565, 344, 70, 14);
-    
-    // boton derrota para volver al menu ppal
-    private static final Rectangle MENU_BTN_DERROTA = new Rectangle(245, 210, 150, 35);
 
     // Constantes del grid — calibradas sobre yard_resize.png (640×360)
     // Área de pasto: x=112–454 (9×38px), y=42–342 (5×60px)
@@ -152,6 +137,15 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         waveManager = new WaveManager(this, enemyManager, GRID_Y, CELL_HEIGHT, GRID_ROWS, 640);
         ultimaOleadaMostrada = waveManager.getOleadaActual();
         mostrarMensajeOleada(ultimaOleadaMostrada); // anuncia "Oleada 1" al empezar
+
+        pantallaDerrota = new PantallaDerrota(
+            this::guardarPartida,
+            () -> {
+                EstadoJuego.SetEstadoJuego(EstadoJuego.MENU);
+                MusicManager.playMenuTheme();
+            }
+        );
+        debugOverlay = new DebugOverlay(GRID_X, GRID_Y, CELL_WIDTH, CELL_HEIGHT, GRID_COLS, GRID_ROWS, DEATH_LINE_X, GRID_BOTTOM);
 
         //CargaGuarda.CreateFile();
         //CargaGuarda.WriteToFile();
@@ -216,7 +210,7 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         if (vidas <= 0) {
             vidas = 0;
             derrota = true;
-            pidiendoNombre = true;
+            pantallaDerrota.activar();
         }
         
         passiveSunTimer++;
@@ -373,11 +367,10 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
 
         // Debug overlay (siempre encima de todo)
-        if (showDebugGrid) drawDebugGrid(g);
-        drawDebugToggle(g);
+        debugOverlay.render(g, lvl, enemyManager.getEnemigos(), combatManager.getProyectiles());
 
         if (derrota) {
-            renderDerrota(g);
+            pantallaDerrota.render(g, puntos);
         }
     }
 
@@ -426,15 +419,11 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     @Override
     public void mouseReleased(int x, int y) {
         if (derrota) {
-            if (!pidiendoNombre && MENU_BTN_DERROTA.contains(x, y)) {
-                EstadoJuego.SetEstadoJuego(EstadoJuego.MENU);
-                MusicManager.playMenuTheme();
-            }
+            pantallaDerrota.mouseReleased(x, y);
             return;
         }
-        
-        if (DEBUG_BTN.contains(x, y)) {
-            showDebugGrid = !showDebugGrid;
+
+        if (debugOverlay.toggle(x, y)) {
             return;
         }
         if (y >= 360) {
@@ -462,9 +451,9 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
                         }
                     }
                 }
-            } else if (showDebugGrid && x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
-                enemyManager.agregaEnemigo(x, y);   
-}
+            } else if (debugOverlay.isActivo() && x > GRID_RIGHT && y >= GRID_Y && y <= GRID_BOTTOM) {
+                enemyManager.agregaEnemigo(x, y);
+            }
             // Combat manager agrega proyectil en x y 
         }
     }
@@ -496,69 +485,11 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
     }
 
-    // render que se muestra cuando se le acaban las vidas al jugador
-    public void renderDerrota(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-
-        g2d.setComposite(ALPHA_OVERLAY);
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, 640, 460);
-        g2d.setComposite(ALPHA_FULL);
-
-        g2d.setFont(FONT_DERROTA);
-        String msg = "Derrota";
-        int msgW = g2d.getFontMetrics().stringWidth(msg);
-        g2d.setColor(Color.RED);
-        g2d.drawString(msg, 320 - msgW / 2, 150);
-
-        g2d.setFont(FONT_MENU_BTN);
-        g2d.setColor(Color.WHITE);
-        String puntosMsg = "Puntos: " + puntos;
-        int pmW = g2d.getFontMetrics().stringWidth(puntosMsg);
-        g2d.drawString(puntosMsg, 320 - pmW / 2, 185);
-
-        if (pidiendoNombre) {
-            String prompt = "Ingresa tus iniciales:";
-            int prW = g2d.getFontMetrics().stringWidth(prompt);
-            g2d.drawString(prompt, 320 - prW / 2, 215);
-
-            StringBuilder display = new StringBuilder(nombreIngresado);
-            while (display.length() < NOMBRE_MAX_LEN) display.append('_');
-            g2d.setFont(FONT_NOMBRE);
-            g2d.setColor(Color.YELLOW);
-            String nombreStr = display.toString();
-            int nW = g2d.getFontMetrics().stringWidth(nombreStr);
-            g2d.drawString(nombreStr, 320 - nW / 2, 260);
-        } 
-        else {
-            g2d.setColor(Color.DARK_GRAY);
-            g2d.fillRect(MENU_BTN_DERROTA.x, MENU_BTN_DERROTA.y, MENU_BTN_DERROTA.width, MENU_BTN_DERROTA.height);
-            g2d.setColor(Color.WHITE);
-            g2d.drawRect(MENU_BTN_DERROTA.x, MENU_BTN_DERROTA.y, MENU_BTN_DERROTA.width, MENU_BTN_DERROTA.height);
-            String btnText = "Volver al Menu";
-            int btnW = g2d.getFontMetrics().stringWidth(btnText);
-            g2d.drawString(btnText, MENU_BTN_DERROTA.x + (MENU_BTN_DERROTA.width - btnW) / 2, MENU_BTN_DERROTA.y + 23);
-        }
-    }
-    
     @Override
     public void keyTyped(char c) {
-        if (!pidiendoNombre) return;
-        
-        if (Character.isLetterOrDigit(c) && nombreIngresado.length() < NOMBRE_MAX_LEN) {
-            nombreIngresado.append(Character.toUpperCase(c));
-        }
-        
-        if (nombreIngresado.length() == NOMBRE_MAX_LEN) {
-            confirmarNombre();
-        }
+        pantallaDerrota.keyTyped(c);
     }
 
-    private void confirmarNombre() {
-        pidiendoNombre = false;
-        guardarPartida(nombreIngresado.toString());
-    }
-    
     private void guardarPartida(String nombre) {
         Jugador jugador = getJuego().getJugadorDAO().findByNombre(nombre);
         int jugadorId;
@@ -582,78 +513,6 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
     }
 
     public boolean isPidiendoNombre() {
-        return pidiendoNombre;
-    }
-
-    // ── Debug helpers ────────────────────────────────────────────────────────
-
-    private void drawDebugToggle(Graphics g) {
-        g.setColor(showDebugGrid ? new Color(200, 0, 0) : new Color(60, 60, 60));
-        g.fillRect(DEBUG_BTN.x, DEBUG_BTN.y, DEBUG_BTN.width, DEBUG_BTN.height);
-        g.setColor(Color.WHITE);
-        g.setFont(FONT_DEBUG_BTN);
-        String label = showDebugGrid ? "Debug: ON" : "Debug: OFF";
-        int lw = g.getFontMetrics().stringWidth(label);
-        g.drawString(label, DEBUG_BTN.x + (DEBUG_BTN.width - lw) / 2,
-                            DEBUG_BTN.y + DEBUG_BTN.height - 3);
-    }
-
-    private void drawDebugGrid(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.setFont(FONT_DEBUG_GRID);
-
-        for (int row = 0; row < GRID_ROWS; row++) {
-            for (int col = 0; col < GRID_COLS; col++) {
-                int cx = GRID_X + col * CELL_WIDTH;
-                int cy = GRID_Y + row * CELL_HEIGHT;
-
-                // Semi-transparent red fill
-                g2d.setComposite(ALPHA_DEBUG);
-                g2d.setColor(Color.RED);
-                g2d.fillRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
-
-                // Solid red border
-                g2d.setComposite(ALPHA_FULL);
-                g2d.setColor(Color.RED);
-                g2d.drawRect(cx, cy, CELL_WIDTH, CELL_HEIGHT);
-
-                // Label: (col,row) on top, lvl value below
-                g2d.setColor(Color.YELLOW);
-                String pos = col + "," + row;
-                int pw = g2d.getFontMetrics().stringWidth(pos);
-                g2d.drawString(pos, cx + (CELL_WIDTH - pw) / 2, cy + 8);
-
-                if (lvl != null && row < lvl.length && col < lvl[row].length) {
-                    String val = "id:" + lvl[row][col];
-                    int vw = g2d.getFontMetrics().stringWidth(val);
-                    g2d.setColor(Color.WHITE);
-                    g2d.drawString(val, cx + (CELL_WIDTH - vw) / 2, cy + CELL_HEIGHT - 2);
-                }
-            }
-        }
-
-        // Grid origin marker
-        g2d.setColor(Color.CYAN);
-        g2d.fillOval(GRID_X - 3, GRID_Y - 3, 6, 6);
-        g2d.setColor(Color.CYAN);
-        g2d.drawString("(" + GRID_X + "," + GRID_Y + ")", GRID_X + 5, GRID_Y - 2);
-        
-        // linea limite de zombies
-        g2d.setComposite(ALPHA_FULL);
-        g2d.setColor(Color.BLUE);
-        g2d.drawLine(DEATH_LINE_X, GRID_Y, DEATH_LINE_X, GRID_BOTTOM);
-
-        // Cajas de colision de enemigos y proyectiles
-        g2d.setColor(Color.GREEN);
-        for (Enemigo e : enemyManager.getEnemigos()) {
-            Rectangle c = e.getColision();
-            g2d.drawRect(c.x, c.y, c.width, c.height);
-        }
-
-        g2d.setColor(Color.MAGENTA);
-        for (Proyectil p : combatManager.getProyectiles()) {
-            Rectangle c = p.getColision();
-            g2d.drawRect(c.x, c.y, c.width, c.height);
-        }
+        return pantallaDerrota.isPidiendoNombre();
     }
 }
