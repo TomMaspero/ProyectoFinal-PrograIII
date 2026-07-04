@@ -220,7 +220,6 @@ public class Jugando extends EscenaJuego implements MetodosEscena {
         }
         
         floatingTexts.removeIf(ft -> --ft.ticksLeft <= 0);
-        
         Runtime.getRuntime().gc();
     }
 
