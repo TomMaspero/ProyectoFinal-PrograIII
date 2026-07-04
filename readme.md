@@ -11,7 +11,7 @@
 
 Clon del clásico juego "Plantas vs Zombies" realizado en Java utilizando las librerías gráficas de Swing y conexión a base de datos mediante JDBC. 
 
-![main](.\docs\pvz-main.png)
+![main](./docs/pvz-main.png)
 
 
 
@@ -25,7 +25,7 @@ Clon del clásico juego "Plantas vs Zombies" realizado en Java utilizando las li
 - Guardado de estadísticas de puntaje por partidas
 - Registro de jugadores al finalizar la partida en metodología "arcade" (se ingresan 3 letras para identificar a un jugador, si no existe en la DB, se crea)
 
-![pvz-demo](.\docs\pvz-demo.png)
+![pvz-demo](./docs/pvz-demo.png)
 
 
 
@@ -33,4 +33,4 @@ Clon del clásico juego "Plantas vs Zombies" realizado en Java utilizando las li
 
 Muestra la grilla en detalle, la línea de límite a la que tienen que llegar los enemigos (en azul) y las colisiones de los proyectiles y enemigos
 
-![pvz-debug](.\docs\pvz-debug.png)
+![pvz-debug](./docs/pvz-debug.png)
